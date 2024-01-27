@@ -7,6 +7,7 @@
 
 #include "./player/Player.hpp"
 
+
 static const float RESPAWN_DELAY = 0.5f;
 static const float DAMAGE_DELAY = 2.f;
 static const float ATTACK_DELAY = 1.f;
@@ -29,15 +30,21 @@ void Player::handleEvent(sf::Event event, Map *map)
     if (sf::Keyboard::isKeyPressed(this->_right)) {
         this->lookingRight = true;
         this->move({5.f,0.f}, map);
+        this->_anim = WALKR;
     }
     if (sf::Keyboard::isKeyPressed(this->_left)) {
         this->lookingRight = false;
         this->move({-5.f,0.f}, map);
+        this->_anim = WALKL;
     }
     if (sf::Keyboard::isKeyPressed(this->_up)) {
         this->jump();
     }
     if (event.type == sf::Event::KeyReleased) {
+        if (event.key.code == this->_left)
+            this->_anim = IDLEL;
+        if (event.key.code == this->_right)
+            this->_anim = IDLER;
         if (event.key.code == this->_up) {
             if (_isJumping == FIRSTJUMP)
                 this->_isJumping = CANDJUMP;
@@ -78,6 +85,8 @@ void Player::resetJump()
 
 void Player::update(Map *map)
 {
+    updateTextureRect();
+    updateColision();
     this->_acceleration.y += this->_gravity;
     this->_velocity.y += this->_acceleration.y;
     if (this->_velocity.y > 15.f)
@@ -229,9 +238,13 @@ void Player::initTouch(PlayerType numberOfThePlayer)
     }
 }
 
+
 void Player::initSprite()
 {
-    this->_player.setTexture(this->_playerTexture);
+    std::vector<int> _array = {1, 1, 7, 7, 5, 5, 5, 5};
+    this->_spriteSheet = new SpriteSheetSimplifier(8, 120, 180, _array);
+    sf::Sprite sprite(_playerTexture, this->_spriteSheet->animate(IDLEL));
+    this->_player = sprite;
 }
 
 void Player::initTexture(std::string path)
@@ -290,6 +303,11 @@ void Player::initFatPigeon()
     this->_playerColision.setPosition(pos);
     this->_playerColision.setOutlineColor(sf::Color::Green);
     this->_playerColision.setOutlineThickness(3);
+}
+
+void Player::updateTextureRect()
+{
+    this->_player.setTextureRect(this->_spriteSheet->animate(this->_anim));
 }
 
 void Player::initSmallPigeon()

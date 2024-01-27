@@ -10,6 +10,7 @@
 #include "../include.hpp"
 #include "./enum/enum.hpp"
 #include "./map/Map.hpp"
+#include "./utils/SpriteSheetSimplifier.hpp"
 
 class Player {
     public:
@@ -39,6 +40,7 @@ class Player {
         void initAttackColision(size_t reachSize);
         void updateColision();
         void updateAttackColision();
+        void updateTextureRect();
         bool isColliding(Map *map);
         void initFatPigeon();
         void initSmallPigeon();
@@ -47,6 +49,10 @@ class Player {
         void initTouch(PlayerType numberOfThePlayer);
 
         sf::Sprite _player;
+        SpriteSheetSimplifier *_spriteSheet;
+        PlayerAnimation _anim = IDLER;
+        sf::Clock _clock;
+        sf::IntRect _rect;
         sf::Texture _playerTexture;
         sf::Vector2f _playerPos;
         sf::Vector2f _oldPlayerPos;

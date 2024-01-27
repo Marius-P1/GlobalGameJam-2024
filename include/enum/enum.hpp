@@ -39,3 +39,16 @@ typedef enum {
     DOUBLEJUMP,
     NONE
 } JumpType;
+
+
+typedef enum {
+    IDLER,
+    IDLEL,
+    WALKR,
+    WALKL,
+    SPECIALR,
+    SPECIALL,
+    ATTACKR,
+    ATTACKL,
+    MAXANIMP,
+} PlayerAnimation;
