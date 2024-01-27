@@ -7,9 +7,9 @@
 
 #include "./player/Player.hpp"
 
-Player::Player()
+Player::Player(PlayerType type)
 {
-    init();
+    init(type);
 }
 
 Player::~Player()
@@ -18,47 +18,96 @@ Player::~Player()
 
 void Player::handleEvent(sf::Event event)
 {
-    if (event.type == sf::Event::KeyPressed) {
-        if (event.key.code == sf::Keyboard::Z) {
-            move(sf::Vector2f(0, -10));
-        }
-        if (event.key.code == sf::Keyboard::S) {
-            move(sf::Vector2f(0, 10));
-        }
-        if (event.key.code == sf::Keyboard::Q) {
-            move(sf::Vector2f(-10, 0));
-        }
-        if (event.key.code == sf::Keyboard::D) {
-            move(sf::Vector2f(10, 0));
+    (void)event;
+    this->_oldPlayerPos = this->_playerPos;
+    if (sf::Keyboard::isKeyPressed(this->_right)) {
+        this->move({5.f,0.f});
+        this->_oldPlayerPos = this->_playerPos;
+    }
+    if (sf::Keyboard::isKeyPressed(this->_left)) {
+        this->move({-5.f,0.f});
+        this->_oldPlayerPos = this->_playerPos;
+    }
+    if (sf::Keyboard::isKeyPressed(this->_up)) {
+        this->jump();
+    }
+    if (event.type == sf::Event::KeyReleased) {
+        if (event.key.code == this->_up) {
+            if (_isJumping == FIRSTJUMP)
+                this->_isJumping = CANDJUMP;
         }
     }
+    if (sf::Keyboard::isKeyPressed(this->_attack)) {
+        updateAttackColision();
+        this->isAttacking = true;
+    }
+    if (sf::Keyboard::isKeyPressed(this->_displayColision)) {
+        this->displayColision = !this->displayColision;
+    }
+}
+
+void Player::jump()
+{
+    if (this->_isJumping == false) {
+        this->_acceleration.y = 0;
+        this->_velocity.y = -6.f;
+        this->_isFly = true;
+        this->_isJumping = FIRSTJUMP;
+        return;
+    }
+     else if (this->_isJumping == CANDJUMP){
+        this->_acceleration.y = 0;
+        this->_velocity.y = -7.f;
+        this->_isFly = true;
+        this->_isJumping = DOUBLEJUMP;
+        return;
+    }
+}
+
+void Player::stateFly(bool state)
+{
+    this->_isFly = state;
+}
+
+void Player::resetJump()
+{
+    this->_isJumping = NOJUMP;
 }
 
 void Player::update()
 {
+    updateColision();
+    this->_acceleration.y += this->_gravity;
+    this->_velocity.y += this->_acceleration.y;
+    if (this->_velocity.y > 15.f)
+        this->_velocity.y = 15.f;
+    move({0,this->_velocity.y});
+    updateColision();
 }
 
 void Player::draw(sf::RenderWindow &window)
 {
+    updateColision();
     window.draw(this->_player);
+    if (this->isAttacking) {
+        window.draw(this->_playerAttackColision);
+        this->isAttacking = false;
+    }
+    if (this->displayColision)
+        displayColisionHitBox(window);
 }
 
 void Player::move(sf::Vector2f move)
 {
-    this->_oldPlayerPos = this->_playerPos;
     this->_playerPos += move;
     this->_player.setPosition(this->_playerPos);
 }
 
-std::vector<sf::Vector2f> Player::getColisionPoints()
+bool Player::isColliding(sf::RectangleShape colision)
 {
-    std::vector<sf::Vector2f> points = std::vector<sf::Vector2f>();
-
-    points.push_back(sf::Vector2f(this->_playerPos.x, this->_playerPos.y));
-    points.push_back(sf::Vector2f(this->_playerPos.x + this->_player.getGlobalBounds().width, this->_playerPos.y));
-    points.push_back(sf::Vector2f(this->_playerPos.x, this->_playerPos.y + this->_player.getGlobalBounds().height));
-    points.push_back(sf::Vector2f(this->_playerPos.x + this->_player.getGlobalBounds().width, this->_playerPos.y + this->_player.getGlobalBounds().height));
-    return points;
+    if (this->_playerColision.getGlobalBounds().intersects(colision.getGlobalBounds()))
+        return true;
+    return false;
 }
 
 sf::Vector2f Player::getOldPlayerPos() const
@@ -72,15 +121,44 @@ void Player::setPlayerPos(sf::Vector2f pos)
     this->_player.setPosition(this->_playerPos);
 }
 
-void Player::init()
+void Player::displayColisionHitBox(sf::RenderWindow &window)
+{
+    window.draw(this->_playerColision);
+}
+
+void Player::init(PlayerType type)
 {
     initTexture();
     initSprite();
     initPos();
     // initOrigin();
-    this->_player.setScale(0.5, 0.5);
     initSpeed();
     this->_oldPlayerPos = this->_playerPos;
+    this->lookingRight = true;
+    this->isAttacking = false;
+    this->displayColision = false;
+    this->_isJumping = JumpType::NOJUMP;
+    this->_gravity = 0.01f;
+    this->_jumpForce = 6.f;
+    this->_velocity = {0,0};
+    this->_acceleration = {0,0};
+    initColision();
+    initAttackColision(50);
+    if (type == PlayerType::PLAYER1) {
+        this->_right = sf::Keyboard::D;
+        this->_left = sf::Keyboard::Q;
+        this->_up = sf::Keyboard::Z;
+        this->_attack = sf::Keyboard::E;
+        this->_jump = sf::Keyboard::Space;
+        this->_displayColision = sf::Keyboard::A;
+    } else {
+        this->_right = sf::Keyboard::Right;
+        this->_left = sf::Keyboard::Left;
+        this->_up = sf::Keyboard::Up;
+        this->_attack = sf::Keyboard::Numpad0;
+        this->_jump = sf::Keyboard::Numpad1;
+        this->_displayColision = sf::Keyboard::Numpad2;
+    }
 }
 
 void Player::initSprite()
@@ -99,18 +177,44 @@ void Player::initPos()
     this->_player.setPosition(this->_playerPos);
 }
 
-void Player::initOrigin()
-{
-    this->_playerOrigin = sf::Vector2f(0, 0);
-    this->_player.setOrigin(this->_playerOrigin);
-}
-
 void Player::initSpeed()
 {
     this->_playerSpeed = sf::Vector2f(0, 0);
 }
 
+void Player::initColision()
+{
+    this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
+    sf::Vector2f pos = this->_playerPos;
+    pos.y += this->_player.getGlobalBounds().height - 173.f;
+    this->_playerColision.setPosition(pos);
+    this->_playerColision.setOutlineColor(sf::Color::Green);
+    this->_playerColision.setOutlineThickness(3);
+}
+
+void Player::initAttackColision(size_t reachSize)
+{
+    this->reachSize = reachSize;
+    this->_playerAttackColision = sf::RectangleShape(sf::Vector2f(this->reachSize, this->_player.getGlobalBounds().height));
+    this->_playerAttackColision.setFillColor(sf::Color::Red);
+}
+
+void Player::updateColision()
+{
+    sf::Vector2f pos = this->_playerPos;
+    pos.y += this->_player.getGlobalBounds().height - 173.f;
+    this->_playerColision.setPosition(pos);
+}
+
+void Player::updateAttackColision()
+{
+    if (this->lookingRight) {
+        this->_playerAttackColision.setPosition(this->_playerPos.x + this->_playerColision.getGlobalBounds().width, this->_playerPos.y);
+    } else {
+        this->_playerAttackColision.setPosition(this->_playerPos.x - this->reachSize, this->_playerPos.y);
+    }
+}
+
 void Player::clean()
 {
 }
-

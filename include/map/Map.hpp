@@ -7,25 +7,27 @@
 
 #pragma once
 
-#include "../include.hpp"
+#include "./include.hpp"
+#include "./enum/enum.hpp"
 
 class Map {
     public:
-        Map();
+        Map(MapType type = MapType::VOLCANO);
         ~Map();
         void draw(sf::RenderWindow &window);
-        sf::Image getColisionImage();
+        std::vector<sf::RectangleShape> getColision();
+        size_t getNbCollisionShape();
 
     private:
-        void init();
+        void init(MapType type);
         void initSprite();
         void initTexture();
-        void initColision();
+        void initColision(MapType type);
         void initPos();
 
         sf::Sprite _mapSprite;
         sf::Texture _mapTexture;
-        sf::Image _colisionImage;
-        sf::Texture _colisionTexture;
+        std::vector<sf::RectangleShape> _colision;
+        size_t _nbCollisionShape;
 
 };

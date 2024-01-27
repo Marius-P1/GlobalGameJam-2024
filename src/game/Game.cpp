@@ -18,40 +18,49 @@ Game::~Game()
 
 void Game::handleEvent(sf::Event event)
 {
-    this->_player->handleEvent(event);
+    this->_player1->handleEvent(event);
+    this->_player2->handleEvent(event);
 }
 
 void Game::update()
 {
-    this->_player->update();
-    if (isColliding())
-        this->_player->setPlayerPos(this->_player->getOldPlayerPos());
+    this->_player1->update();
+    this->_player2->update();
+
+    if (isColliding(this->_player1)) {
+        this->_player1->stateFly(false);
+        this->_player1->resetJump();
+        this->_player1->setPlayerPos(this->_player1->getOldPlayerPos());
+    }
+    if (isColliding(this->_player2)) {
+        this->_player2->stateFly(false);
+        this->_player2->resetJump();
+        this->_player2->setPlayerPos(this->_player2->getOldPlayerPos());
+    }
 }
 
 void Game::draw(sf::RenderWindow &window)
 {
-    this->_player->draw(window);
     this->_map->draw(window);
+
+    this->_player1->draw(window);
+    this->_player2->draw(window);
 }
 
 void Game::init()
 {
     this->_map = new Map();
-    this->_player = new Player();
+    this->_player1 = new Player(PlayerType::PLAYER1);
+    this->_player2 = new Player(PlayerType::PLAYER2);
 }
 
-bool Game::isColliding()
+bool Game::isColliding(Player *player)
 {
-    std::vector<sf::Vector2f> points = this->_player->getColisionPoints();
+    std::vector<sf::RectangleShape> colision = this->_map->getColision();
 
-    for (size_t i = 0; i < points.size(); i++) {
-        if (points[i].x < 0 || points[i].y < 0 || points[i].x > this->_map->getColisionImage().getSize().x || points[i].y > this->_map->getColisionImage().getSize().y)
+    for (size_t i = 0; i < this->_map->getNbCollisionShape(); i++) {
+        if (player->isColliding(colision[i]))
             return true;
-        sf::Color pixel = this->_map->getColisionImage().getPixel(points[i].x, points[i].y);
-        if (pixel == sf::Color::Red) {
-            std::cout << "COLLISION in " << points[i].x << " " << points[i].y << std::endl;
-            return true;
-        }
     }
     return false;
 }

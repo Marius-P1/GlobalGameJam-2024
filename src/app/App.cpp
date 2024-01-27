@@ -40,8 +40,8 @@ void App::handleEvent()
     while (this->_window.pollEvent(this->_event)) {
         if (this->_event.type == sf::Event::Closed)
             this->_isRunning = false;
-        this->_game->handleEvent(this->_event);
     }
+    this->_game->handleEvent(this->_event);
 }
 
 void App::update()

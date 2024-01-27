@@ -18,13 +18,14 @@ class Game {
         void handleEvent(sf::Event event);
         void update();
         void draw(sf::RenderWindow &window);
-        bool isColliding();
+        bool isColliding(Player *player);
 
     private:
         void init();
         void clean();
 
-        Player *_player;
+        Player *_player1;
+        Player *_player2;
         Map *_map;
 
 };
