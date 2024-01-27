@@ -10,6 +10,7 @@
 #include "../include.hpp"
 #include "./enum/enum.hpp"
 #include "./map/Map.hpp"
+#include "./utils/SpriteSheetSimplifier.hpp"
 
 class Player {
     public:
@@ -41,6 +42,8 @@ class Player {
         void clean();
 
         sf::Sprite _player;
+        SpriteSheetSimplifier *_spriteSheet;
+        PlayerAnimation _anim = IDLER;
         sf::Clock _clock;
         sf::IntRect _rect;
         sf::Texture _playerTexture;

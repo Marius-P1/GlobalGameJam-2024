@@ -7,6 +7,7 @@
 
 #include "./player/Player.hpp"
 
+
 Player::Player(PlayerType type)
 {
     init(type);
@@ -21,14 +22,20 @@ void Player::handleEvent(sf::Event event, Map *map)
     this->_oldPlayerPos = this->_playerPos;
     if (sf::Keyboard::isKeyPressed(this->_right)) {
         this->move({5.f,0.f}, map);
+        this->_anim = WALKR;
     }
     if (sf::Keyboard::isKeyPressed(this->_left)) {
         this->move({-5.f,0.f}, map);
+        this->_anim = WALKL;
     }
     if (sf::Keyboard::isKeyPressed(this->_up)) {
         this->jump();
     }
     if (event.type == sf::Event::KeyReleased) {
+        if (event.key.code == this->_left)
+            this->_anim = IDLEL;
+        if (event.key.code == this->_right)
+            this->_anim = IDLER;
         if (event.key.code == this->_up) {
             if (_isJumping == FIRSTJUMP)
                 this->_isJumping = CANDJUMP;
@@ -154,17 +161,18 @@ void Player::init(PlayerType type)
     }
 }
 
+
 void Player::initSprite()
 {
-    sf::IntRect rect(0, 360,122, 180);
-    sf::Sprite sprite(this->_playerTexture, this->_rect);
+    std::vector<int> _array = {1, 1, 7, 7, 5, 5, 5, 5};
+    this->_spriteSheet = new SpriteSheetSimplifier(8, 120, 180, _array);
+    sf::Sprite sprite(_playerTexture, this->_spriteSheet->animate(IDLEL));
     this->_player = sprite;
-    this->_rect = rect;
 }
 
 void Player::initTexture()
 {
-    this->_playerTexture.loadFromFile("assets/player/red.png");
+    this->_playerTexture.loadFromFile("assets/player/fatPigeon.png");
 }
 
 void Player::initPos()
@@ -214,29 +222,9 @@ void Player::updateAttackColision()
 
 void Player::updateTextureRect()
 {
-    if (this->_clock.getElapsedTime().asSeconds() > 0.1f ) {
-        this->_player.setTextureRect(this->_rect);
-        if (this->_rect.left == 840) {
-            this->_rect.left = 0;
-        } else {
-            this->_rect.left += 120;
-        }
-        this->_clock.restart();
-    } 
+    this->_player.setTextureRect(this->_spriteSheet->animate(this->_anim));
 }
 
-void Player::updateTextureRect()
-{
-    if (this->_clock.getElapsedTime().asSeconds() > 0.1f ) {
-        this->_player.setTextureRect(this->_rect);
-        if (this->_rect.left == 840) {
-            this->_rect.left = 0;
-        } else {
-            this->_rect.left += 120;
-        }
-        this->_clock.restart();
-    } 
-}
 
 bool Player::isColliding(Map *map)
 {
