@@ -19,9 +19,9 @@ Map::~Map()
 void Map::draw(sf::RenderWindow &window)
 {
     window.draw(this->_mapSprite);
-    for (size_t i = 0; i < this->_colision.size(); i++) {
-        window.draw(this->_colision[i]);
-    }
+    // for (size_t i = 0; i < this->_colision.size(); i++) {
+    //     window.draw(this->_colision[i]);
+    // }
 }
 
 std::vector<sf::RectangleShape> Map::getColision()

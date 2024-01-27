@@ -16,17 +16,14 @@ Player::~Player()
 {
 }
 
-void Player::handleEvent(sf::Event event)
+void Player::handleEvent(sf::Event event, Map *map)
 {
-    (void)event;
     this->_oldPlayerPos = this->_playerPos;
     if (sf::Keyboard::isKeyPressed(this->_right)) {
-        this->move({5.f,0.f});
-        this->_oldPlayerPos = this->_playerPos;
+        this->move({5.f,0.f}, map);
     }
     if (sf::Keyboard::isKeyPressed(this->_left)) {
-        this->move({-5.f,0.f});
-        this->_oldPlayerPos = this->_playerPos;
+        this->move({-5.f,0.f}, map);
     }
     if (sf::Keyboard::isKeyPressed(this->_up)) {
         this->jump();
@@ -74,7 +71,7 @@ void Player::resetJump()
     this->_isJumping = NOJUMP;
 }
 
-void Player::update()
+void Player::update(Map *map)
 {
     updateTextureRect();
     updateColision();
@@ -82,8 +79,7 @@ void Player::update()
     this->_velocity.y += this->_acceleration.y;
     if (this->_velocity.y > 15.f)
         this->_velocity.y = 15.f;
-    move({0,this->_velocity.y});
-    updateColision();
+    move({0,this->_velocity.y}, map);
 }
 
 void Player::draw(sf::RenderWindow &window)
@@ -98,28 +94,24 @@ void Player::draw(sf::RenderWindow &window)
         displayColisionHitBox(window);
 }
 
-void Player::move(sf::Vector2f move)
+void Player::move(sf::Vector2f move, Map *map)
 {
+    this->_oldPlayerPos = this->_playerPos;
     this->_playerPos += move;
     this->_player.setPosition(this->_playerPos);
-}
-
-bool Player::isColliding(sf::RectangleShape colision)
-{
-    if (this->_playerColision.getGlobalBounds().intersects(colision.getGlobalBounds()))
-        return true;
-    return false;
-}
-
-sf::Vector2f Player::getOldPlayerPos() const
-{
-    return this->_oldPlayerPos;
+    updateColision();
+    if (isColliding(map)) {
+        stateFly(false);
+        resetJump();
+        setPlayerPos(this->_oldPlayerPos);
+    }
 }
 
 void Player::setPlayerPos(sf::Vector2f pos)
 {
     this->_playerPos = pos;
     this->_player.setPosition(this->_playerPos);
+    updateColision();
 }
 
 void Player::displayColisionHitBox(sf::RenderWindow &window)
@@ -208,6 +200,7 @@ void Player::updateColision()
     sf::Vector2f pos = this->_playerPos;
     pos.y += this->_player.getGlobalBounds().height - 173.f;
     this->_playerColision.setPosition(pos);
+    updateAttackColision();
 }
 
 void Player::updateAttackColision()
@@ -230,6 +223,30 @@ void Player::updateTextureRect()
         }
         this->_clock.restart();
     } 
+}
+
+void Player::updateTextureRect()
+{
+    if (this->_clock.getElapsedTime().asSeconds() > 0.1f ) {
+        this->_player.setTextureRect(this->_rect);
+        if (this->_rect.left == 840) {
+            this->_rect.left = 0;
+        } else {
+            this->_rect.left += 120;
+        }
+        this->_clock.restart();
+    } 
+}
+
+bool Player::isColliding(Map *map)
+{
+    std::vector<sf::RectangleShape> colision = map->getColision();
+
+    for (size_t i = 0; i < map->getNbCollisionShape(); i++) {
+        if (this->_playerColision.getGlobalBounds().intersects(colision[i].getGlobalBounds()))
+            return true;
+    }
+    return false;
 }
 
 void Player::clean()

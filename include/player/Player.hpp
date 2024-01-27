@@ -9,24 +9,22 @@
 
 #include "../include.hpp"
 #include "./enum/enum.hpp"
+#include "./map/Map.hpp"
 
 class Player {
     public:
         Player(PlayerType type = PlayerType::PLAYER1);
         ~Player();
-        void handleEvent(sf::Event event);
-        void update();
+        void handleEvent(sf::Event event, Map *map);
+        void update(Map *map);
         void draw(sf::RenderWindow &window);
-        void move(sf::Vector2f move);
+        void move(sf::Vector2f move, Map *map);
         void setPlayerPos(sf::Vector2f pos);
         sf::Vector2f getOldPlayerPos() const;
-        bool isColliding(sf::RectangleShape colision);
         void displayColisionHitBox(sf::RenderWindow &window);
         void resetJump();
         void stateFly(bool state);
         void jump();
-
-
 
     private:
         void init(PlayerType type);
@@ -39,6 +37,7 @@ class Player {
         void updateColision();
         void updateAttackColision();
         void updateTextureRect();
+        bool isColliding(Map *map);
         void clean();
 
         sf::Sprite _player;
