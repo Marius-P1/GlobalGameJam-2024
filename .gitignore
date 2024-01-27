@@ -30,4 +30,7 @@
 *.exe
 *.out
 *.app
-my_game
+GGJ2024
+
+# IDE
+.vscode

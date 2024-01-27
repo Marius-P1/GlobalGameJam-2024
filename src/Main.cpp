@@ -5,8 +5,10 @@
 ** main
 */
 
+#include "./app/App.hpp"
+
 int main()
 {
-    /* code */
+    App app;
     return 0;
 }

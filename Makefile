@@ -6,10 +6,13 @@
 ##
 
 ## config
-NAME = 			my_game
+NAME = 			GGJ2024
 
-_SRC =			app/app.cpp \
-				main.cpp
+_SRC =			app/App.cpp \
+				player/Player.cpp \
+				map/Map.cpp \
+				game/Game.cpp \
+				Main.cpp
 
 SRCDIR = 		src/
 
