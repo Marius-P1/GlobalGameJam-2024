@@ -68,6 +68,7 @@ class Player {
         bool _isFly;
         float _jumpForce;
         int _nbLife;
+        float _hitboxHeight;
         sf::Clock _attackClock;
         sf::Clock _damageClock;
         sf::Clock _respawnClock;
