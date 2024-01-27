@@ -23,9 +23,17 @@ class Game {
     private:
         void init();
         void clean();
+        bool isFallen(Player *player);
+        void randomGameParam();
 
         Player *_player1;
+        PigeonType _player1PigeonType;
         Player *_player2;
+        PigeonType _player2PigeonType;
         Map *_map;
+        MapType _mapType;
+        int _nbPlayerAlive;
+        int _player1Life;
+        int _player2Life;
 
 };
