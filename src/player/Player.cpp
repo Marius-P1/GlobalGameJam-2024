@@ -76,6 +76,7 @@ void Player::resetJump()
 
 void Player::update()
 {
+    updateTextureRect();
     updateColision();
     this->_acceleration.y += this->_gravity;
     this->_velocity.y += this->_acceleration.y;
@@ -163,12 +164,15 @@ void Player::init(PlayerType type)
 
 void Player::initSprite()
 {
-    this->_player.setTexture(this->_playerTexture);
+    sf::IntRect rect(0, 360,122, 180);
+    sf::Sprite sprite(this->_playerTexture, this->_rect);
+    this->_player = sprite;
+    this->_rect = rect;
 }
 
 void Player::initTexture()
 {
-    this->_playerTexture.loadFromFile("assets/player/player.png");
+    this->_playerTexture.loadFromFile("assets/player/red.png");
 }
 
 void Player::initPos()
@@ -213,6 +217,19 @@ void Player::updateAttackColision()
     } else {
         this->_playerAttackColision.setPosition(this->_playerPos.x - this->reachSize, this->_playerPos.y);
     }
+}
+
+void Player::updateTextureRect()
+{
+    if (this->_clock.getElapsedTime().asSeconds() > 0.1f ) {
+        this->_player.setTextureRect(this->_rect);
+        if (this->_rect.left == 840) {
+            this->_rect.left = 0;
+        } else {
+            this->_rect.left += 120;
+        }
+        this->_clock.restart();
+    } 
 }
 
 void Player::clean()

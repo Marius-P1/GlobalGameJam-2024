@@ -38,9 +38,12 @@ class Player {
         void initAttackColision(size_t reachSize);
         void updateColision();
         void updateAttackColision();
+        void updateTextureRect();
         void clean();
 
         sf::Sprite _player;
+        sf::Clock _clock;
+        sf::IntRect _rect;
         sf::Texture _playerTexture;
         sf::Vector2f _playerPos;
         sf::Vector2f _oldPlayerPos;
