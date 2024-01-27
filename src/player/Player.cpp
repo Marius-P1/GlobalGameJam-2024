@@ -7,7 +7,6 @@
 
 #include "./player/Player.hpp"
 
-
 static const float RESPAWN_DELAY = 0.5f;
 static const float DAMAGE_DELAY = 2.f;
 static const float ATTACK_DELAY = 1.f;
@@ -110,7 +109,6 @@ void Player::draw(sf::RenderWindow &window)
         respawn.setFillColor(sf::Color::Red);
         window.draw(respawn);
     }
-
 }
 
 void Player::move(sf::Vector2f move, Map *map)
@@ -199,18 +197,18 @@ void Player::init(PlayerType numberOfThePlayer, PigeonType pigeonType, sf::Vecto
     initVariables();
 
     switch (pigeonType) {
-        // case PigeonType::FAT_PIGEON :
-        //     initFatPigeon();
-        //     break;
-        // case PigeonType::SMALL_PIGEON :
-        //     initSmallPigeon();
-        //     break;
-        // case PigeonType::THIN_PIGEON :
-        //     initThinPigeon();
-        //     break;
-        // case PigeonType::MUSCULAR_PIGEON :
-        //     initMuscularPigeon();
-        //     break;
+        case PigeonType::FAT_PIGEON :
+            initFatPigeon();
+            break;
+        case PigeonType::SMALL_PIGEON :
+            initSmallPigeon();
+            break;
+        case PigeonType::THIN_PIGEON :
+            initThinPigeon();
+            break;
+        case PigeonType::MUSCULAR_PIGEON :
+            initMuscularPigeon();
+            break;
         default:
             initThinPigeon();
             break;
@@ -251,7 +249,6 @@ void Player::initTexture(std::string path)
 {
     this->_playerTexture.loadFromFile(path);
 }
-
 
 void Player::initVariables()
 {
@@ -294,7 +291,7 @@ void Player::updateColision()
 
 void Player::initFatPigeon()
 {
-    initTexture("assets/player/fat_pigeon.png");
+    initTexture("assets/player/fatPigeon.png");
     initSprite();
 
     this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
@@ -312,7 +309,7 @@ void Player::updateTextureRect()
 
 void Player::initSmallPigeon()
 {
-    initTexture("assets/player/small_pigeon.png");
+    initTexture("assets/player/smallPigeon.png");
     initSprite();
 
     this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
@@ -325,7 +322,7 @@ void Player::initSmallPigeon()
 
 void Player::initThinPigeon()
 {
-    initTexture("assets/player/thin_pigeon.png");
+    initTexture("assets/player/thinPigeon.png");
     initSprite();
 
     this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
@@ -338,7 +335,7 @@ void Player::initThinPigeon()
 
 void Player::initMuscularPigeon()
 {
-    initTexture("assets/player/muscular_pigeon.png");
+    initTexture("assets/player/muscularPigeon.png");
     initSprite();
 
     this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
