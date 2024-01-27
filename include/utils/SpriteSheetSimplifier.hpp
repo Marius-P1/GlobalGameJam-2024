@@ -16,12 +16,11 @@ class SpriteSheetSimplifier {
         SpriteSheetSimplifier(int nbLigne, int x, int y, std::vector<int> array);
         ~SpriteSheetSimplifier();
         sf::IntRect animate(int anim);
-        void updateAnim();
-
 
     protected:
     private:
         void updateRect();
+        void updateAnim();
         int _nbLigne;
         int _nbSprites;
         int _width;
@@ -32,6 +31,4 @@ class SpriteSheetSimplifier {
         sf::Clock _time;
         sf::IntRect _rect;
 };
-
-
 

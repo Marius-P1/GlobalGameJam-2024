@@ -55,3 +55,5 @@ sf::IntRect SpriteSheetSimplifier::animate(int anim)
     return this->_rect;
 }
 
+
+
