@@ -17,17 +17,24 @@ class Map {
         void draw(sf::RenderWindow &window);
         std::vector<sf::RectangleShape> getColision();
         size_t getNbCollisionShape();
+        sf::Vector2f getSpawnPos();
 
     private:
         void init(MapType type);
         void initSprite();
-        void initTexture();
-        void initColision(MapType type);
+        void initTexture(std::string path);
         void initPos();
+        void initMapVolcano();
+        void initMapJungle();
+        void initMapSnow();
+        void initMapSky();
 
         sf::Sprite _mapSprite;
         sf::Texture _mapTexture;
         std::vector<sf::RectangleShape> _colision;
         size_t _nbCollisionShape;
+        std::vector<sf::Vector2f> _spawnPos;
+        size_t _indexSpawnPos;
+        sf::Vector2f _lastSpawnPos;
 
 };

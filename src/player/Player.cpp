@@ -7,9 +7,14 @@
 
 #include "./player/Player.hpp"
 
-Player::Player(PlayerType type)
+static const float RESPAWN_DELAY = 0.5f;
+static const float DAMAGE_DELAY = 2.f;
+static const float ATTACK_DELAY = 1.f;
+static const int ATTACK_RANGE = 80;
+
+Player::Player(PlayerType playerType, PigeonType pigeonType, sf::Vector2f pos)
 {
-    init(type);
+    init(playerType, pigeonType, pos);
 }
 
 Player::~Player()
@@ -18,11 +23,15 @@ Player::~Player()
 
 void Player::handleEvent(sf::Event event, Map *map)
 {
+    if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY)
+        return;
     this->_oldPlayerPos = this->_playerPos;
     if (sf::Keyboard::isKeyPressed(this->_right)) {
+        this->lookingRight = true;
         this->move({5.f,0.f}, map);
     }
     if (sf::Keyboard::isKeyPressed(this->_left)) {
+        this->lookingRight = false;
         this->move({-5.f,0.f}, map);
     }
     if (sf::Keyboard::isKeyPressed(this->_up)) {
@@ -33,10 +42,6 @@ void Player::handleEvent(sf::Event event, Map *map)
             if (_isJumping == FIRSTJUMP)
                 this->_isJumping = CANDJUMP;
         }
-    }
-    if (sf::Keyboard::isKeyPressed(this->_attack)) {
-        updateAttackColision();
-        this->isAttacking = true;
     }
     if (sf::Keyboard::isKeyPressed(this->_displayColision)) {
         this->displayColision = !this->displayColision;
@@ -90,6 +95,13 @@ void Player::draw(sf::RenderWindow &window)
     }
     if (this->displayColision)
         displayColisionHitBox(window);
+    if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY) {
+        sf::RectangleShape respawn(sf::Vector2f(100, 100));
+        respawn.setPosition(this->_playerPos);
+        respawn.setFillColor(sf::Color::Red);
+        window.draw(respawn);
+    }
+
 }
 
 void Player::move(sf::Vector2f move, Map *map)
@@ -117,85 +129,39 @@ void Player::displayColisionHitBox(sf::RenderWindow &window)
     window.draw(this->_playerColision);
 }
 
-void Player::init(PlayerType type)
+void Player::respawn(sf::Vector2f spawnPos)
 {
-    initTexture();
-    initSprite();
-    initPos();
-    // initOrigin();
-    initSpeed();
-    this->_oldPlayerPos = this->_playerPos;
-    this->lookingRight = true;
-    this->isAttacking = false;
-    this->displayColision = false;
-    this->_isJumping = JumpType::NOJUMP;
-    this->_gravity = 0.01f;
-    this->_jumpForce = 6.f;
-    this->_velocity = {0,0};
-    this->_acceleration = {0,0};
-    initColision();
-    initAttackColision(50);
-    if (type == PlayerType::PLAYER1) {
-        this->_right = sf::Keyboard::D;
-        this->_left = sf::Keyboard::Q;
-        this->_up = sf::Keyboard::Z;
-        this->_attack = sf::Keyboard::E;
-        this->_jump = sf::Keyboard::Space;
-        this->_displayColision = sf::Keyboard::A;
-    } else {
-        this->_right = sf::Keyboard::Right;
-        this->_left = sf::Keyboard::Left;
-        this->_up = sf::Keyboard::Up;
-        this->_attack = sf::Keyboard::Numpad0;
-        this->_jump = sf::Keyboard::Numpad1;
-        this->_displayColision = sf::Keyboard::Numpad2;
-    }
-}
-
-void Player::initSprite()
-{
-    this->_player.setTexture(this->_playerTexture);
-}
-
-void Player::initTexture()
-{
-    this->_playerTexture.loadFromFile("assets/player/player.png");
-}
-
-void Player::initPos()
-{
-    this->_playerPos = sf::Vector2f(0, 0);
+    this->_playerPos = spawnPos;
     this->_player.setPosition(this->_playerPos);
+    this->_nbLife--;
+    this->_respawnClock.restart();
+    updateColision();
 }
 
-void Player::initSpeed()
+int Player::useAttack(Player *player)
 {
-    this->_playerSpeed = sf::Vector2f(0, 0);
+    if (this->_attackClock.getElapsedTime().asSeconds() > ATTACK_DELAY) {
+        this->_attackClock.restart();
+        this->isAttacking = true;
+        updateAttackColision();
+        if (this->_playerAttackColision.getGlobalBounds().intersects(player->_playerColision.getGlobalBounds())) {
+            if (player->_damageClock.getElapsedTime().asSeconds() > DAMAGE_DELAY) {
+                player->_damageClock.restart();
+                player->_nbLife--;
+            }
+        }
+    }
+    return player->_nbLife;
 }
 
-void Player::initColision()
+sf::Keyboard::Key Player::getAttackKey() const
 {
-    this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
-    sf::Vector2f pos = this->_playerPos;
-    pos.y += this->_player.getGlobalBounds().height - 173.f;
-    this->_playerColision.setPosition(pos);
-    this->_playerColision.setOutlineColor(sf::Color::Green);
-    this->_playerColision.setOutlineThickness(3);
+    return this->_attack;
 }
 
-void Player::initAttackColision(size_t reachSize)
+sf::Vector2f Player::getPos() const
 {
-    this->reachSize = reachSize;
-    this->_playerAttackColision = sf::RectangleShape(sf::Vector2f(this->reachSize, this->_player.getGlobalBounds().height));
-    this->_playerAttackColision.setFillColor(sf::Color::Red);
-}
-
-void Player::updateColision()
-{
-    sf::Vector2f pos = this->_playerPos;
-    pos.y += this->_player.getGlobalBounds().height - 173.f;
-    this->_playerColision.setPosition(pos);
-    updateAttackColision();
+    return this->_playerPos;
 }
 
 void Player::updateAttackColision()
@@ -218,6 +184,149 @@ bool Player::isColliding(Map *map)
     return false;
 }
 
-void Player::clean()
+void Player::init(PlayerType numberOfThePlayer, PigeonType pigeonType, sf::Vector2f spawnPos)
 {
+    initPos(spawnPos);
+    initVariables();
+
+    switch (pigeonType) {
+        // case PigeonType::FAT_PIGEON :
+        //     initFatPigeon();
+        //     break;
+        // case PigeonType::SMALL_PIGEON :
+        //     initSmallPigeon();
+        //     break;
+        // case PigeonType::THIN_PIGEON :
+        //     initThinPigeon();
+        //     break;
+        // case PigeonType::MUSCULAR_PIGEON :
+        //     initMuscularPigeon();
+        //     break;
+        default:
+            initThinPigeon();
+            break;
+    }
+    initAttackColision(ATTACK_RANGE);
+    initTouch(numberOfThePlayer);
+}
+
+void Player::initTouch(PlayerType numberOfThePlayer)
+{
+    if (numberOfThePlayer == PlayerType::PLAYER1) {
+        this->_right = sf::Keyboard::D;
+        this->_left = sf::Keyboard::Q;
+        this->_up = sf::Keyboard::Z;
+        this->_attack = sf::Keyboard::E;
+        this->_jump = sf::Keyboard::Space;
+        this->_displayColision = sf::Keyboard::K;
+    } else {
+        this->_right = sf::Keyboard::Right;
+        this->_left = sf::Keyboard::Left;
+        this->_up = sf::Keyboard::Up;
+        this->_attack = sf::Keyboard::Numpad0;
+        this->_jump = sf::Keyboard::Numpad1;
+        this->_displayColision = sf::Keyboard::Add;
+    }
+}
+
+void Player::initSprite()
+{
+    this->_player.setTexture(this->_playerTexture);
+}
+
+void Player::initTexture(std::string path)
+{
+    this->_playerTexture.loadFromFile(path);
+}
+
+
+void Player::initVariables()
+{
+    this->_oldPlayerPos = this->_playerPos;
+    this->lookingRight = true;
+    this->isAttacking = false;
+    this->displayColision = false;
+    this->_isJumping = JumpType::NOJUMP;
+    this->_gravity = 0.01f;
+    this->_jumpForce = 6.f;
+    this->_velocity = {0,0};
+    this->_acceleration = {0,0};
+    this->_nbLife = 3;
+    this->_isFly = true;
+    this->_attackClock.restart();
+    this->_damageClock.restart();
+    this->_respawnClock.restart();
+}
+
+void Player::initPos(sf::Vector2f spawnPos)
+{
+    this->_playerPos = spawnPos;
+    this->_player.setPosition(this->_playerPos);
+}
+
+void Player::initAttackColision(size_t reachSize)
+{
+    this->reachSize = reachSize;
+    this->_playerAttackColision = sf::RectangleShape(sf::Vector2f(this->reachSize, this->_player.getGlobalBounds().height));
+    this->_playerAttackColision.setFillColor(sf::Color::Red);
+}
+
+void Player::updateColision()
+{
+    sf::Vector2f pos = this->_playerPos;
+    pos.y += this->_player.getGlobalBounds().height - 173.f;
+    this->_playerColision.setPosition(pos);
+    updateAttackColision();
+}
+
+void Player::initFatPigeon()
+{
+    initTexture("assets/player/fat_pigeon.png");
+    initSprite();
+
+    this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
+    sf::Vector2f pos = this->_playerPos;
+    pos.y += this->_player.getGlobalBounds().height - 173.f;
+    this->_playerColision.setPosition(pos);
+    this->_playerColision.setOutlineColor(sf::Color::Green);
+    this->_playerColision.setOutlineThickness(3);
+}
+
+void Player::initSmallPigeon()
+{
+    initTexture("assets/player/small_pigeon.png");
+    initSprite();
+
+    this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
+    sf::Vector2f pos = this->_playerPos;
+    pos.y += this->_player.getGlobalBounds().height - 173.f;
+    this->_playerColision.setPosition(pos);
+    this->_playerColision.setOutlineColor(sf::Color::Green);
+    this->_playerColision.setOutlineThickness(3);
+}
+
+void Player::initThinPigeon()
+{
+    initTexture("assets/player/thin_pigeon.png");
+    initSprite();
+
+    this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
+    sf::Vector2f pos = this->_playerPos;
+    pos.y += this->_player.getGlobalBounds().height - 173.f;
+    this->_playerColision.setPosition(pos);
+    this->_playerColision.setOutlineColor(sf::Color::Green);
+    this->_playerColision.setOutlineThickness(3);
+}
+
+void Player::initMuscularPigeon()
+{
+    initTexture("assets/player/muscular_pigeon.png");
+    initSprite();
+
+    this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 173.f));
+    sf::Vector2f pos = this->_playerPos;
+    pos.y += this->_player.getGlobalBounds().height - 173.f;
+    this->_playerColision.setPosition(pos);
+    this->_playerColision.setOutlineColor(sf::Color::Green);
+    this->_playerColision.setOutlineThickness(3);
 }

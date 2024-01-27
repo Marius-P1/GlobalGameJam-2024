@@ -20,12 +20,34 @@ void Game::handleEvent(sf::Event event)
 {
     this->_player1->handleEvent(event, this->_map);
     this->_player2->handleEvent(event, this->_map);
+    if (sf::Keyboard::isKeyPressed(this->_player1->getAttackKey())) {
+        this->_player2Life = this->_player1->useAttack(this->_player2);
+    }
+    if (sf::Keyboard::isKeyPressed(this->_player2->getAttackKey())) {
+        this->_player1Life = this->_player2->useAttack(this->_player1);
+    }
+    if (this->_player1Life == 0 || this->_player2Life == 0) {
+        this->_nbPlayerAlive--;
+        if (this->_player1Life == 0) {
+            std::cout << "Player 2 win" << std::endl;
+        } else {
+            std::cout << "Player 1 win" << std::endl;
+        }
+    }
 }
 
 void Game::update()
 {
     this->_player1->update(this->_map);
     this->_player2->update(this->_map);
+    if (isFallen(this->_player1)) {
+        this->_player1->respawn(this->_map->getSpawnPos());
+        this->_player1Life--;
+    }
+    if (isFallen(this->_player2)) {
+        this->_player2->respawn(this->_map->getSpawnPos());
+        this->_player2Life--;
+    }
 }
 
 void Game::draw(sf::RenderWindow &window)
@@ -36,9 +58,31 @@ void Game::draw(sf::RenderWindow &window)
     this->_player2->draw(window);
 }
 
+bool Game::isFallen(Player *player)
+{
+    if (player->getPos().y > 1080) {
+        return true;
+    }
+    return false;
+}
+
 void Game::init()
 {
-    this->_map = new Map();
-    this->_player1 = new Player(PlayerType::PLAYER1);
-    this->_player2 = new Player(PlayerType::PLAYER2);
+    randomGameParam();
+    this->_map = new Map(this->_mapType);
+    this->_player1 = new Player(PlayerType::PLAYER1, this->_player1PigeonType, this->_map->getSpawnPos());
+    this->_player2 = new Player(PlayerType::PLAYER2, this->_player2PigeonType, this->_map->getSpawnPos());
+    this->_nbPlayerAlive = 2;
+    this->_player1Life = 3;
+    this->_player2Life = 3;
+}
+
+void Game::randomGameParam()
+{
+    time_t t;
+    std::srand(static_cast<unsigned int>(time(&t)));
+
+    this->_mapType = static_cast<MapType>(std::rand() % 4);
+    this->_player1PigeonType = static_cast<PigeonType>(std::rand() % 4);
+    this->_player2PigeonType = static_cast<PigeonType>(std::rand() % 4);
 }

@@ -27,9 +27,9 @@ typedef enum {
 
 typedef enum {
     VOLCANO,
-    FOREST,
-    CITY,
-    BEACH
+    JUNGLE,
+    SNOW,
+    SKY
 } MapType;
 
 typedef enum {
@@ -38,4 +38,4 @@ typedef enum {
     CANDJUMP,
     DOUBLEJUMP,
     NONE
-}JumpType;
+} JumpType;
