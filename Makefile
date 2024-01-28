@@ -15,6 +15,7 @@ _SRC =			app/App.cpp \
 				map/Map.cpp \
 				game/Game.cpp \
 				utils/SpriteSheetSimplifier.cpp\
+				player/Life.cpp\
 				Main.cpp
 
 SRCDIR = 		src/

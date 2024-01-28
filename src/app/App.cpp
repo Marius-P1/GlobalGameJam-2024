@@ -60,4 +60,5 @@ void App::draw()
 void App::clean()
 {
     this->_window.close();
+    delete this->_game;
 }

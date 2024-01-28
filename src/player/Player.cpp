@@ -15,6 +15,7 @@ Player::Player(PlayerType playerType, PigeonType pigeonType, sf::Vector2f pos)
 
 Player::~Player()
 {
+    delete this->_spriteSheet;
 }
 
 void Player::handleEvent(sf::Event event, Map *map)
@@ -102,17 +103,27 @@ void Player::update(Map *map)
 }
 
 
+void Player::drawShield(sf::RenderWindow &window)
+{
+    sf::Vector2f pos = this->_playerColision.getPosition();
+    sf::Vector2f size = this->_playerColision.getSize();
+    sf::Vector2f shieldSize = this->_shield.getSize();
+    sf::Vector2f center = {pos.x + size.x / 2, pos.y + size.y / 2};
+    sf::Vector2f shieldPos = {center.x - shieldSize.x / 2, center.y - shieldSize.y / 2};
+
+    this->_shield.setPosition(shieldPos);
+    window.draw(this->_shield);
+}
+
 void Player::draw(sf::RenderWindow &window)
 {
     updateColision();
     window.draw(this->_player);
     if (this->displayColision)
         displayColisionHitBox(window);
-    if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY) {
-        sf::RectangleShape respawn(sf::Vector2f(100, 100));
-        respawn.setPosition(this->_playerPos);
-        respawn.setFillColor(sf::Color::Red);
-        window.draw(respawn);
+    if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY ||
+    this->_damageClock.getElapsedTime().asSeconds() < DAMAGE_DELAY) {
+        drawShield(window);
     }
 }
 
@@ -123,8 +134,11 @@ void Player::move(sf::Vector2f move, Map *map)
     this->_player.setPosition(this->_playerPos);
     updateColision();
     if (isColliding(map)) {
-        stateFly(false);
-        resetJump();
+        if (move.y >= 0) {
+            this->_isFly = false;
+            resetJump();
+        }
+        this->_velocity.y = 0;
         setPlayerPos(this->_oldPlayerPos);
     }
 }
