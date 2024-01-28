@@ -162,6 +162,7 @@ void Player::respawn(sf::Vector2f spawnPos)
 int Player::useAttack(Player *player)
 {
     if (this->_attackClock.getElapsedTime().asSeconds() > ATTACK_DELAY) {
+        this->_soundAttack.play();
         this->_attackClock.restart();
         this->isAttacking = true;
         updateAttackColision();
@@ -221,6 +222,11 @@ void Player::updateTextureRect()
     this->_player.setTextureRect(this->_spriteSheet->animate(this->_anim));
 }
 
+std::string Player::getPathWinTexture() const
+{
+    return this->_pathWinTexture;
+}
+
 void Player::init(PlayerType numberOfThePlayer, PigeonType pigeonType, sf::Vector2f spawnPos)
 {
     initPos(spawnPos);
@@ -245,6 +251,9 @@ void Player::init(PlayerType numberOfThePlayer, PigeonType pigeonType, sf::Vecto
     }
     initAttackColision(ATTACK_RANGE);
     initTouch(numberOfThePlayer);
+    this->_soundBufferDamage.loadFromFile("assets/sound/damage.ogg");
+    this->_soundDamage.setBuffer(this->_soundBufferDamage);
+    this->_soundDamage.setVolume(50);
 }
 
 void Player::initTouch(PlayerType numberOfThePlayer)
@@ -327,6 +336,13 @@ void Player::initFatPigeon()
     this->_hitboxWidth = 0.f;
     this->_shield = sf::RectangleShape(sf::Vector2f(80, 80));
     this->_shield.setTexture(&this->_shieldTexture);
+    this->_pathWinTexture = "assets/player/FatWin/ezgif-frame-";
+    this->_soundBufferAttack.loadFromFile("assets/sound/fatAttack.ogg");
+    this->_soundAttack.setBuffer(this->_soundBufferAttack);
+    this->_soundAttack.setVolume(50);
+    this->_soundBufferSpecial.loadFromFile("assets/sound/fatSpecial.ogg");
+    this->_soundSpecial.setBuffer(this->_soundBufferSpecial);
+    this->_soundSpecial.setVolume(50);
 }
 
 void Player::initSmallPigeon()
@@ -345,6 +361,13 @@ void Player::initSmallPigeon()
     this->_hitboxWidth = 0.f;
     this->_shield = sf::RectangleShape(sf::Vector2f(50, 50));
     this->_shield.setTexture(&this->_shieldTexture);
+    this->_pathWinTexture = "assets/player/SmallWin/ezgif-frame-";
+    this->_soundBufferAttack.loadFromFile("assets/sound/smallAttack.ogg");
+    this->_soundAttack.setBuffer(this->_soundBufferAttack);
+    this->_soundAttack.setVolume(50);
+    this->_soundBufferSpecial.loadFromFile("assets/sound/smallSpecial.ogg");
+    this->_soundSpecial.setBuffer(this->_soundBufferSpecial);
+    this->_soundSpecial.setVolume(50);
 }
 
 void Player::initThinPigeon()
@@ -363,6 +386,13 @@ void Player::initThinPigeon()
     this->_hitboxWidth = 0.f;
     this->_shield = sf::RectangleShape(sf::Vector2f(60, 60));
     this->_shield.setTexture(&this->_shieldTexture);
+    this->_pathWinTexture = "assets/player/ThinWin/ezgif-frame-";
+    this->_soundBufferAttack.loadFromFile("assets/sound/thinAttack.ogg");
+    this->_soundAttack.setBuffer(this->_soundBufferAttack);
+    this->_soundAttack.setVolume(50);
+    this->_soundBufferSpecial.loadFromFile("assets/sound/thinSpecial.ogg");
+    this->_soundSpecial.setBuffer(this->_soundBufferSpecial);
+    this->_soundSpecial.setVolume(50);
 }
 
 void Player::initMuscularPigeon()
@@ -382,4 +412,11 @@ void Player::initMuscularPigeon()
     this->_hitboxWidth = 20.f;
     this->_shield = sf::RectangleShape(sf::Vector2f(80, 80));
     this->_shield.setTexture(&this->_shieldTexture);
+    this->_pathWinTexture = "assets/player/MuscularWin/ezgif-frame-";
+    this->_soundBufferAttack.loadFromFile("assets/sound/muscularAttack.ogg");
+    this->_soundAttack.setBuffer(this->_soundBufferAttack);
+    this->_soundAttack.setVolume(50);
+    this->_soundBufferSpecial.loadFromFile("assets/sound/muscularSpecial.ogg");
+    this->_soundSpecial.setBuffer(this->_soundBufferSpecial);
+    this->_soundSpecial.setVolume(50);
 }

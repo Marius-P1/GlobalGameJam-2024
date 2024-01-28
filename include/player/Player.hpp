@@ -31,6 +31,7 @@ class Player {
         sf::Keyboard::Key getAttackKey() const;
         void respawn(sf::Vector2f spawnPos);
         sf::Vector2f getPos() const;
+        std::string getPathWinTexture() const;
 
     private:
         void init(PlayerType type, PigeonType pigeonType, sf::Vector2f spawnPos);
@@ -63,6 +64,7 @@ class Player {
         sf::RectangleShape _playerAttackColision;
         sf::Texture _shieldTexture;
         sf::RectangleShape _shield;
+        std::string _pathWinTexture;
         size_t reachSize;
         bool lookingRight;
         bool isAttacking;
@@ -83,5 +85,16 @@ class Player {
         sf::Keyboard::Key _attack;
         sf::Keyboard::Key _jump;
         sf::Keyboard::Key _displayColision;
+        sf::SoundBuffer _soundBufferAttack;
+        sf::Sound _soundAttack;
+        sf::SoundBuffer _soundBufferSpecial;
+        sf::Sound _soundSpecial;
+        sf::SoundBuffer _soundBufferDamage;
+        sf::Sound _soundDamage;
+        sf::SoundBuffer _soundBufferJump;
+        sf::Sound _soundJump;
+        sf::SoundBuffer _soundBufferWin;
+        sf::Sound _soundWin;
+
 
 };

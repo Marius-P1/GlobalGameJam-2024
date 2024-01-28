@@ -8,6 +8,9 @@
 #pragma once
 
 #include "./game/Game.hpp"
+#include "./menu/Menu.hpp"
+#include "./include.hpp"
+#include "./enum/enum.hpp"
 
 class App {
     public:
@@ -16,25 +19,23 @@ class App {
 
     private:
         void run();
-        void handleEvent();
-        void update();
-        void draw();
+        void runMenu();
+        void runGame();
+        void handleEventGame();
+        void updateGame();
+        void drawGame();
+        void handleEventMenu();
+        void updateMenu();
+        void drawMenu();
         void init();
         void clean();
+        void resetGame();
 
+        SceneType _sceneType;
         bool _isRunning;
         sf::Event _event;
         sf::RenderWindow _window;
         Game *_game;
+        Menu *_menu;
 
 };
-
-class map{
-    public:
-        void run();
-    private:
-    sf::RectangleShape _bot;
-
-};
-
-

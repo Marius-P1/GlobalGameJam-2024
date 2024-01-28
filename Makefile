@@ -14,6 +14,7 @@ _SRC =			app/App.cpp \
 				game/Game.cpp \
 				utils/SpriteSheetSimplifier.cpp\
 				player/Life.cpp\
+				menu/Menu.cpp\
 				Main.cpp
 
 SRCDIR = 		src/
@@ -26,7 +27,7 @@ INC = 			-I./include
 
 FLAGS 	=		-W -Wall -Wextra -Werror -g
 
-MODULES = -lsfml-graphics -lsfml-window -lsfml-system
+MODULES = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 all: 			$(NAME) clean
 
