@@ -109,7 +109,7 @@ void Life::initSmallPigeon()
 void Life::initThinPigeon()
 {
     this->_pigeonTexture.loadFromFile("./assets/player/headPigeonThin.png");
-    this->_pigeon = sf::RectangleShape(sf::Vector2f(100, 100));
+    this->_pigeon = sf::RectangleShape(sf::Vector2f(100, 140));
     this->_pigeon.setTexture(&this->_pigeonTexture);
 }
 
@@ -125,11 +125,11 @@ void Life::initPos(PlayerType playerType)
     switch (playerType) {
         case PlayerType::PLAYER1 :
             this->_lifePos = sf::Vector2f(200, 930);
-            this->_pigeonPos = sf::Vector2f(50, 930);
+            this->_pigeonPos = sf::Vector2f(50, 980 - this->_pigeon.getSize().y / 2);
             break;
         case PlayerType::PLAYER2 :
             this->_lifePos = sf::Vector2f(1620, 930);
-            this->_pigeonPos = sf::Vector2f(1770, 930);
+            this->_pigeonPos = sf::Vector2f(1770, 980 - this->_pigeon.getSize().y / 2);
             break;
         default:
             break;
