@@ -19,6 +19,7 @@ Player::Player(PlayerType playerType, PigeonType pigeonType, sf::Vector2f pos)
 
 Player::~Player()
 {
+    delete this->_spriteSheet;
 }
 
 void Player::handleEvent(sf::Event event, Map *map)
@@ -93,6 +94,18 @@ void Player::update(Map *map)
     move({0,this->_velocity.y}, map);
 }
 
+void Player::drawShield(sf::RenderWindow &window)
+{
+    sf::Vector2f pos = this->_playerColision.getPosition();
+    sf::Vector2f size = this->_playerColision.getSize();
+    sf::Vector2f shieldSize = this->_shield.getSize();
+    sf::Vector2f center = {pos.x + size.x / 2, pos.y + size.y / 2};
+    sf::Vector2f shieldPos = {center.x - shieldSize.x / 2, center.y - shieldSize.y / 2};
+
+    this->_shield.setPosition(shieldPos);
+    window.draw(this->_shield);
+}
+
 void Player::draw(sf::RenderWindow &window)
 {
     updateColision();
@@ -103,11 +116,9 @@ void Player::draw(sf::RenderWindow &window)
     }
     if (this->displayColision)
         displayColisionHitBox(window);
-    if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY) {
-        sf::RectangleShape respawn(sf::Vector2f(100, 100));
-        respawn.setPosition(this->_playerPos);
-        respawn.setFillColor(sf::Color::Red);
-        window.draw(respawn);
+    if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY ||
+    this->_damageClock.getElapsedTime().asSeconds() < DAMAGE_DELAY) {
+        drawShield(window);
     }
 }
 
@@ -251,7 +262,6 @@ void Player::initTouch(PlayerType numberOfThePlayer)
     }
 }
 
-
 void Player::initSprite()
 {
     std::vector<int> _array = {1, 1, 7, 7, 5, 5, 5, 5};
@@ -263,6 +273,7 @@ void Player::initSprite()
 void Player::initTexture(std::string path)
 {
     this->_playerTexture.loadFromFile(path);
+    this->_shieldTexture.loadFromFile("assets/player/shield.png");
 }
 
 void Player::initVariables()
@@ -307,8 +318,10 @@ void Player::initFatPigeon()
     this->_playerColision.setPosition(pos);
     this->_playerColision.setFillColor(sf::Color::Transparent);
     this->_playerColision.setOutlineColor(sf::Color::Green);
-    this->_playerColision.setOutlineThickness(3);
+    this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 144.f;
+    this->_shield = sf::RectangleShape(sf::Vector2f(80, 80));
+    this->_shield.setTexture(&this->_shieldTexture);
 }
 
 void Player::initSmallPigeon()
@@ -322,8 +335,10 @@ void Player::initSmallPigeon()
     this->_playerColision.setPosition(pos);
     this->_playerColision.setFillColor(sf::Color::Transparent);
     this->_playerColision.setOutlineColor(sf::Color::Green);
-    this->_playerColision.setOutlineThickness(3);
+    this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 105.f;
+    this->_shield = sf::RectangleShape(sf::Vector2f(50, 50));
+    this->_shield.setTexture(&this->_shieldTexture);
 }
 
 void Player::initThinPigeon()
@@ -337,8 +352,10 @@ void Player::initThinPigeon()
     this->_playerColision.setPosition(pos);
     this->_playerColision.setFillColor(sf::Color::Transparent);
     this->_playerColision.setOutlineColor(sf::Color::Green);
-    this->_playerColision.setOutlineThickness(3);
+    this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 149.f;
+    this->_shield = sf::RectangleShape(sf::Vector2f(60, 60));
+    this->_shield.setTexture(&this->_shieldTexture);
 }
 
 void Player::initMuscularPigeon()
@@ -352,6 +369,8 @@ void Player::initMuscularPigeon()
     this->_playerColision.setPosition(pos);
     this->_playerColision.setFillColor(sf::Color::Transparent);
     this->_playerColision.setOutlineColor(sf::Color::Green);
-    this->_playerColision.setOutlineThickness(3);
+    this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 130.f;
+    this->_shield = sf::RectangleShape(sf::Vector2f(80, 80));
+    this->_shield.setTexture(&this->_shieldTexture);
 }

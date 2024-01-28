@@ -19,6 +19,7 @@ class Player {
         void handleEvent(sf::Event event, Map *map);
         void update(Map *map);
         void draw(sf::RenderWindow &window);
+        void drawShield(sf::RenderWindow &window);
         void move(sf::Vector2f move, Map *map);
         void setPlayerPos(sf::Vector2f pos);
         sf::Vector2f getOldPlayerPos() const;
@@ -60,6 +61,8 @@ class Player {
         sf::Vector2f _acceleration;
         sf::RectangleShape _playerColision;
         sf::RectangleShape _playerAttackColision;
+        sf::Texture _shieldTexture;
+        sf::RectangleShape _shield;
         size_t reachSize;
         bool lookingRight;
         bool isAttacking;
