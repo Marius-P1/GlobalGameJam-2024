@@ -10,6 +10,8 @@ NAME = 			GGJ2024
 
 _SRC =			app/App.cpp \
 				player/Player.cpp \
+				player/Attack.cpp\
+				player/Init.cpp\
 				map/Map.cpp \
 				game/Game.cpp \
 				utils/SpriteSheetSimplifier.cpp\

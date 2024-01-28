@@ -12,6 +12,11 @@
 #include "./map/Map.hpp"
 #include "./utils/SpriteSheetSimplifier.hpp"
 
+static const float RESPAWN_DELAY = 0.5f;
+static const float DAMAGE_DELAY = 2.f;
+static const float ATTACK_DELAY = 1.f;
+static const int ATTACK_RANGE = 80;
+
 class Player {
     public:
         Player(PlayerType type, PigeonType pigeonType, sf::Vector2f spawnPos);
