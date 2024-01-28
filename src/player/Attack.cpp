@@ -12,17 +12,44 @@ void Player::stateFly(bool state)
     this->_isFly = state;
 }
 
+void Player::updateSpecialAnimation()
+{
+    if (this->isSpecial) {
+        if (this->lookingRight)
+            this->_anim = SPECIALR;
+        else
+            this->_anim = SPECIALL;
+        this->isSpecial = false;
+    }
+}
+
+void Player::makeDash()
+{
+    if (this->_type == PigeonType::FAT_PIGEON || this->_type ==  PigeonType::MUSCULAR_PIGEON || this->_type == PigeonType::SMALL_PIGEON) {
+        if (this->_anim == SPECIALR) {
+            move({7,0}, this->_map);
+        } else if (this->_anim == SPECIALL){
+            move({-7,0}, this->_map);
+        }
+    }
+}
+
 void Player::updateAttackAnimation()
 {
     if (this->isAttacking) {
-        this->_timeAttack = this->_attackClock.getElapsedTime().asSeconds();
         if (this->lookingRight)
             this->_anim = ATTACKR;
         else
             this->_anim = ATTACKL;
         this->isAttacking = false;
     }
-    if (this->_attackClock.getElapsedTime().asSeconds() - this->_timeAttack > 0.5f){
+
+}
+
+void Player::attackResetAnim()
+{
+    if (this->_attackClock.getElapsedTime().asSeconds() > 0.5f &&
+    this->_SpecialClock.getElapsedTime().asSeconds() > 0.5f) {
         if (this->lookingRight)
                 this->_anim = IDLER;
             else
@@ -46,6 +73,21 @@ int Player::useAttack(Player *player)
     return player->_nbLife;
 }
 
+int Player::useSpecial(Player *player)
+{
+    if (this->_SpecialClock.getElapsedTime().asSeconds() > SPECIAL_DELAY){
+        this->_SpecialClock.restart();
+        this->isSpecial = true;
+        updateAttackColision();
+        if (this->_playerAttackColision.getGlobalBounds().intersects(player->_playerColision.getGlobalBounds())) {
+            if (player->_damageClock.getElapsedTime().asSeconds() > DAMAGE_DELAY) {
+                player->_damageClock.restart();
+                player->_nbLife -= 2;
+            }
+        }
+    }
+    return player->_nbLife;
+}
 
 void Player::updateAttackColision()
 {

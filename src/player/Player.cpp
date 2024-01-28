@@ -19,7 +19,15 @@ Player::~Player()
 
 void Player::handleEvent(sf::Event event, Map *map)
 {
-    if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY  || this->_attackClock.getElapsedTime().asSeconds() < 0.4f){
+    this->_map = map;
+    if(this->_type == PigeonType::THIN_PIGEON && (this->_anim == SPECIALR || this->_anim == SPECIALL)){
+        if (sf::Keyboard::isKeyPressed(this->_right))
+            this->move({5.f,0.f}, map);
+        if (sf::Keyboard::isKeyPressed(this->_left))
+            this->move({-5.f,0.f}, map);
+        return;
+    }
+    if ((this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY  || this->_attackClock.getElapsedTime().asSeconds() < 0.4f)){
         this->_velocity = {0,0};
         this->_acceleration = {0,0};
         return;
@@ -64,6 +72,8 @@ void Player::jump()
     }
      else if (this->_isJumping == CANDJUMP && this->_canDoDJump == true){
         this->_acceleration.y = 0;
+        this->isSpecial = true;
+        this->_attackClock.restart();
         this->_velocity.y = this->_jumpForce;
         this->_isFly = true;
         this->_isJumping = DOUBLEJUMP;
@@ -80,6 +90,10 @@ void Player::update(Map *map)
 {
     updateTextureRect();
     updateColision();
+    updateAttackAnimation();
+    updateSpecialAnimation();
+    attackResetAnim();
+    makeDash();
     this->_acceleration.y += this->_gravity;
     this->_velocity.y += this->_acceleration.y;
     if (this->_velocity.y > 15.f)
@@ -92,7 +106,6 @@ void Player::draw(sf::RenderWindow &window)
 {
     updateColision();
     window.draw(this->_player);
-    updateAttackAnimation();
     if (this->displayColision)
         displayColisionHitBox(window);
     if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY) {
@@ -140,6 +153,11 @@ void Player::respawn(sf::Vector2f spawnPos)
 sf::Keyboard::Key Player::getAttackKey() const
 {
     return this->_attack;
+}
+
+sf::Keyboard::Key Player::getSpecial() const
+{
+    return this->_special;
 }
 
 sf::Vector2f Player::getPos() const

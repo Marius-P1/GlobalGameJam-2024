@@ -10,7 +10,7 @@
 void Player::init(PlayerType numberOfThePlayer, PigeonType pigeonType, sf::Vector2f spawnPos)
 {
     initPos(spawnPos);
-    initVariables();
+    initVariables(pigeonType);
 
     switch (pigeonType) {
         case PigeonType::FAT_PIGEON :
@@ -40,6 +40,7 @@ void Player::initTouch(PlayerType numberOfThePlayer)
         this->_left = sf::Keyboard::Q;
         this->_up = sf::Keyboard::Z;
         this->_attack = sf::Keyboard::E;
+        this->_special = sf::Keyboard::A;
         this->_jump = sf::Keyboard::Space;
         this->_displayColision = sf::Keyboard::K;
     } else {
@@ -47,6 +48,7 @@ void Player::initTouch(PlayerType numberOfThePlayer)
         this->_left = sf::Keyboard::Left;
         this->_up = sf::Keyboard::Up;
         this->_attack = sf::Keyboard::Numpad0;
+        this->_special = sf::Keyboard::Numpad2;
         this->_jump = sf::Keyboard::Numpad1;
         this->_displayColision = sf::Keyboard::Add;
     }
@@ -64,11 +66,13 @@ void Player::initTexture(std::string path)
     this->_playerTexture.loadFromFile(path);
 }
 
-void Player::initVariables()
+void Player::initVariables(PigeonType pigeonType)
 {
+    this->_type = pigeonType;
     this->_oldPlayerPos = this->_playerPos;
     this->lookingRight = true;
     this->isAttacking = false;
+    this->isSpecial = false;
     this->displayColision = false;
     this->_isJumping = JumpType::NOJUMP;
     this->_gravity = 0.01f;
