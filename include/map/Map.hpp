@@ -18,6 +18,7 @@ class Map {
         std::vector<sf::RectangleShape> getColision();
         size_t getNbCollisionShape();
         sf::Vector2f getSpawnPos();
+        void stopSound();
 
     private:
         void init(MapType type);

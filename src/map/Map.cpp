@@ -46,6 +46,11 @@ sf::Vector2f Map::getSpawnPos()
     return this->_lastSpawnPos;
 }
 
+void Map::stopSound()
+{
+    this->_sound.stop();
+}
+
 void Map::init(MapType type)
 {
     switch (type) {

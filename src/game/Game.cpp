@@ -45,10 +45,12 @@ bool Game::menuButtonHandling(sf::Event event)
 
 SceneType Game::handleEvent(sf::Event event)
 {
-    if (this->_nbPlayer1Life == 0 || this->_nbPlayer2Life == 0) {
-        if (menuButtonHandling(event))
+    if (this->_nbPlayer1Life <= 0 || this->_nbPlayer2Life <= 0) {
+        if (menuButtonHandling(event)) {
+            this->_sound.stop();
+            this->_isSoundPlayed = false;
             return SceneType::MENU;
-        else
+        } else
             return SceneType::GAME;
     }
     this->_player1->handleEvent(event, this->_map);
@@ -98,8 +100,9 @@ void Game::update()
     this->_player1Life->setLife(this->_nbPlayer1Life);
     this->_player2Life->setLife(this->_nbPlayer2Life);
     updateMenuButton();
-    if (this->_nbPlayer1Life == 0 || this->_nbPlayer2Life == 0) {
+    if (this->_nbPlayer1Life <= 0 || this->_nbPlayer2Life <= 0) {
         if (!this->_isSoundPlayed) {
+            this->_map->stopSound();
             this->_sound.play();
             this->_isSoundPlayed = true;
         }
@@ -134,10 +137,10 @@ void Game::draw(sf::RenderWindow &window)
     this->_player2->draw(window);
     this->_player1Life->draw(window);
     this->_player2Life->draw(window);
-    if (this->_nbPlayer1Life == 0) {
+    if (this->_nbPlayer1Life <= 0) {
         drawnWin(window, this->_player2);
     }
-    if (this->_nbPlayer2Life == 0) {
+    if (this->_nbPlayer2Life <= 0) {
         drawnWin(window, this->_player1);
     }
 }

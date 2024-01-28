@@ -79,6 +79,7 @@ void App::runGame()
     updateGame();
     drawGame();
     if (this->_sceneType == MENU) {
+        this->_menu->resetMenu();
         resetGame();
     }
 }
