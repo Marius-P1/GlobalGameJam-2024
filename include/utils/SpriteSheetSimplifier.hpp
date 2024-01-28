@@ -21,6 +21,7 @@ class SpriteSheetSimplifier {
     private:
         void updateRect();
         void updateAnim();
+
         int _nbLigne;
         int _nbSprites;
         int _width;

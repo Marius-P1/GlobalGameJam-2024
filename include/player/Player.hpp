@@ -12,6 +12,12 @@
 #include "./map/Map.hpp"
 #include "./utils/SpriteSheetSimplifier.hpp"
 
+static const float RESPAWN_DELAY = 0.5f;
+static const float DAMAGE_DELAY = 2.f;
+static const float SPECIAL_DELAY = 10.f;
+static const float ATTACK_DELAY = 1.f;
+static const int ATTACK_RANGE = 80;
+
 class Player {
     public:
         Player(PlayerType type, PigeonType pigeonType, sf::Vector2f spawnPos);
@@ -26,31 +32,43 @@ class Player {
         void displayColisionHitBox(sf::RenderWindow &window);
         void resetJump();
         void stateFly(bool state);
+        sf::FloatRect getBound();
         void jump();
         int useAttack(Player *player);
+        int useSpecial(Player *player);
+        int makeDamage(Player *player);
         sf::Keyboard::Key getAttackKey() const;
+        sf::Keyboard::Key getSpecial() const;
         void respawn(sf::Vector2f spawnPos);
         sf::Vector2f getPos() const;
         std::string getPathWinTexture() const;
 
     private:
+        //init
         void init(PlayerType type, PigeonType pigeonType, sf::Vector2f spawnPos);
-        void initSprite();
+        void initSprite(std::vector<int> array);
         void initTexture(std::string path);
-        void initVariables();
+        void initVariables(PigeonType pigeonType);
         void initPos(sf::Vector2f spawnPos);
         void initAttackColision(size_t reachSize);
-        void updateColision();
-        void updateAttackColision();
-        void updateTextureRect();
-        bool isColliding(Map *map);
         void initFatPigeon();
         void initSmallPigeon();
         void initThinPigeon();
         void initMuscularPigeon();
         void initTouch(PlayerType numberOfThePlayer);
+        //attack
+        void updateSpecialAnimation();
+        void updateAttackColision();
+        void attackResetAnim();
+        void updateTextureRect();
+        void updateAttackAnimation();
+        void makeDash();
+        //colision
+        void updateColision();
+        bool isColliding(Map *map);
 
         sf::Sprite _player;
+        Map *_map;
         SpriteSheetSimplifier *_spriteSheet;
         PlayerAnimation _anim = IDLER;
         sf::Clock _clock;
@@ -66,23 +84,31 @@ class Player {
         sf::RectangleShape _shield;
         std::string _pathWinTexture;
         size_t reachSize;
+        float _timeAttack;
+        float _timeSpecial;
         bool lookingRight;
         bool isAttacking;
+        bool isSpecial;
         bool displayColision;
+        bool _canDoDJump;
+        bool _canSpecial = false;
         float _gravity;
         bool _isFly;
         float _jumpForce;
         int _nbLife;
+        int _type;
         float _hitboxHeight;
         float _hitboxWidth;
         sf::Clock _attackClock;
         sf::Clock _damageClock;
         sf::Clock _respawnClock;
+        sf::Clock _SpecialClock;
         JumpType _isJumping;
         sf::Keyboard::Key _right;
         sf::Keyboard::Key _left;
         sf::Keyboard::Key _up;
         sf::Keyboard::Key _attack;
+        sf::Keyboard::Key _special;
         sf::Keyboard::Key _jump;
         sf::Keyboard::Key _displayColision;
         sf::SoundBuffer _soundBufferAttack;

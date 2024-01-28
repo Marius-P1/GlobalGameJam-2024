@@ -5,6 +5,7 @@
 ** SpriteSheetSimplifier
 */
 
+#include "./enum/enum.hpp"
 #include "./utils/SpriteSheetSimplifier.hpp"
 
 SpriteSheetSimplifier::SpriteSheetSimplifier(int nbLigne, int x, int y, std::vector<int> array)
@@ -40,20 +41,17 @@ void SpriteSheetSimplifier::updateAnim()
     }
 }
 
+
 sf::IntRect SpriteSheetSimplifier::animate(int anim)
 {
     this->_nbSprites = this->_array[anim];
-    if (anim == this->_anim)
-        updateAnim();
-    else {
-        this->_anim = anim;
-        this->_rect.left = 0;
-        this->_index = 0;
-        updateRect();
-    }
-
+        if (anim == this->_anim)
+            updateAnim();
+        else {
+            this->_anim = anim;
+            this->_rect.left = 0;
+            this->_index = 0;
+            updateRect();
+        }
     return this->_rect;
 }
-
-
-
