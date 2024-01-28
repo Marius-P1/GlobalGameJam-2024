@@ -27,7 +27,7 @@ void Player::handleEvent(sf::Event event, Map *map)
             this->move({-5.f,0.f}, map);
         return;
     }
-    if ((this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY  || this->_attackClock.getElapsedTime().asSeconds() < 0.4f)){
+    if ((this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY  || this->_attackClock.getElapsedTime().asSeconds() < 0.4f || this->_SpecialClock.getElapsedTime().asSeconds() < 0.4f)){
         this->_velocity = {0,0};
         this->_acceleration = {0,0};
         return;
@@ -174,4 +174,9 @@ bool Player::isColliding(Map *map)
             return true;
     }
     return false;
+}
+
+sf::FloatRect Player::getBound()
+{
+    return this->_playerColision.getGlobalBounds();
 }

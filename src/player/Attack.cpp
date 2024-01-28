@@ -43,7 +43,6 @@ void Player::updateAttackAnimation()
             this->_anim = ATTACKL;
         this->isAttacking = false;
     }
-
 }
 
 void Player::attackResetAnim()
@@ -78,13 +77,7 @@ int Player::useSpecial(Player *player)
     if (this->_SpecialClock.getElapsedTime().asSeconds() > SPECIAL_DELAY){
         this->_SpecialClock.restart();
         this->isSpecial = true;
-        updateAttackColision();
-        if (this->_playerAttackColision.getGlobalBounds().intersects(player->_playerColision.getGlobalBounds())) {
-            if (player->_damageClock.getElapsedTime().asSeconds() > DAMAGE_DELAY) {
-                player->_damageClock.restart();
-                player->_nbLife -= 2;
-            }
-        }
+        this->_canSpecial = true;
     }
     return player->_nbLife;
 }
@@ -96,4 +89,13 @@ void Player::updateAttackColision()
     } else {
         this->_playerAttackColision.setPosition(this->_playerPos.x - this->reachSize, this->_playerPos.y);
     }
+}
+
+int Player::makeDamage(Player *player)
+{
+    if (this->_canSpecial == true && (this->_anim == SPECIALL || this->_anim == SPECIALR) && this->_playerColision.getGlobalBounds().intersects(player->_playerColision.getGlobalBounds()) ) {
+        player->_nbLife -=2;
+        this->_canSpecial = false;
+    }
+    return player->_nbLife;
 }

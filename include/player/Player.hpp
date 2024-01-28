@@ -31,34 +31,39 @@ class Player {
         void displayColisionHitBox(sf::RenderWindow &window);
         void resetJump();
         void stateFly(bool state);
+        sf::FloatRect getBound();
         void jump();
         int useAttack(Player *player);
         int useSpecial(Player *player);
+        int makeDamage(Player *player);
         sf::Keyboard::Key getAttackKey() const;
         sf::Keyboard::Key getSpecial() const;
         void respawn(sf::Vector2f spawnPos);
         sf::Vector2f getPos() const;
 
     private:
+        //init
         void init(PlayerType type, PigeonType pigeonType, sf::Vector2f spawnPos);
         void initSprite(std::vector<int> array);
         void initTexture(std::string path);
         void initVariables(PigeonType pigeonType);
         void initPos(sf::Vector2f spawnPos);
         void initAttackColision(size_t reachSize);
-        void updateColision();
+        void initFatPigeon();
+        void initSmallPigeon();
+        void initThinPigeon();
+        void initMuscularPigeon();
+        void initTouch(PlayerType numberOfThePlayer);
+        //attack
         void updateSpecialAnimation();
         void updateAttackColision();
         void attackResetAnim();
         void updateTextureRect();
         void updateAttackAnimation();
-        bool isColliding(Map *map);
-        void initFatPigeon();
         void makeDash();
-        void initSmallPigeon();
-        void initThinPigeon();
-        void initMuscularPigeon();
-        void initTouch(PlayerType numberOfThePlayer);
+        //colision
+        void updateColision();
+        bool isColliding(Map *map);
 
         sf::Sprite _player;
         Map *_map;
@@ -81,6 +86,7 @@ class Player {
         bool isSpecial;
         bool displayColision;
         bool _canDoDJump;
+        bool _canSpecial = false;
         float _gravity;
         bool _isFly;
         float _jumpForce;
