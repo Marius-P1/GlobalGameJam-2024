@@ -14,6 +14,11 @@ Game::Game()
 
 Game::~Game()
 {
+    delete this->_player1;
+    delete this->_player2;
+    delete this->_map;
+    delete this->_player1Life;
+    delete this->_player2Life;
 }
 
 void Game::handleEvent(sf::Event event)

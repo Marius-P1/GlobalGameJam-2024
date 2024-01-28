@@ -72,6 +72,7 @@ class Player {
         float _jumpForce;
         int _nbLife;
         float _hitboxHeight;
+        float _hitboxWidth;
         sf::Clock _attackClock;
         sf::Clock _damageClock;
         sf::Clock _respawnClock;

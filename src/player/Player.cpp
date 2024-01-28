@@ -129,8 +129,11 @@ void Player::move(sf::Vector2f move, Map *map)
     this->_player.setPosition(this->_playerPos);
     updateColision();
     if (isColliding(map)) {
-        stateFly(false);
-        resetJump();
+        if (move.y >= 0) {
+            this->_isFly = false;
+            resetJump();
+        }
+        this->_velocity.y = 0;
         setPlayerPos(this->_oldPlayerPos);
     }
 }
@@ -185,10 +188,10 @@ sf::Vector2f Player::getPos() const
 void Player::updateAttackColision()
 {
     if (this->lookingRight) {
-        this->_playerAttackColision.setPosition(this->_playerPos.x + this->_playerColision.getGlobalBounds().width,
+        this->_playerAttackColision.setPosition(this->_playerPos.x + this->_playerColision.getGlobalBounds().width + this->_hitboxWidth,
         this->_playerPos.y + this->_player.getGlobalBounds().height - this->_hitboxHeight);
     } else {
-        this->_playerAttackColision.setPosition(this->_playerPos.x - this->reachSize,
+        this->_playerAttackColision.setPosition(this->_playerPos.x + this->_hitboxWidth - this->reachSize,
         this->_playerPos.y + this->_player.getGlobalBounds().height - this->_hitboxHeight);
     }
 }
@@ -208,6 +211,7 @@ void Player::updateColision()
 {
     sf::Vector2f pos = this->_playerPos;
     pos.y += this->_player.getGlobalBounds().height - this->_hitboxHeight;
+    pos.x += this->_hitboxWidth;
     this->_playerColision.setPosition(pos);
     updateAttackColision();
 }
@@ -320,6 +324,7 @@ void Player::initFatPigeon()
     this->_playerColision.setOutlineColor(sf::Color::Green);
     this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 144.f;
+    this->_hitboxWidth = 0.f;
     this->_shield = sf::RectangleShape(sf::Vector2f(80, 80));
     this->_shield.setTexture(&this->_shieldTexture);
 }
@@ -337,6 +342,7 @@ void Player::initSmallPigeon()
     this->_playerColision.setOutlineColor(sf::Color::Green);
     this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 105.f;
+    this->_hitboxWidth = 0.f;
     this->_shield = sf::RectangleShape(sf::Vector2f(50, 50));
     this->_shield.setTexture(&this->_shieldTexture);
 }
@@ -354,6 +360,7 @@ void Player::initThinPigeon()
     this->_playerColision.setOutlineColor(sf::Color::Green);
     this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 149.f;
+    this->_hitboxWidth = 0.f;
     this->_shield = sf::RectangleShape(sf::Vector2f(60, 60));
     this->_shield.setTexture(&this->_shieldTexture);
 }
@@ -363,14 +370,16 @@ void Player::initMuscularPigeon()
     initTexture("assets/player/muscularPigeon.png");
     initSprite();
 
-    this->_playerColision = sf::RectangleShape(sf::Vector2f(78.f, 130.f));
+    this->_playerColision = sf::RectangleShape(sf::Vector2f(80.f, 130.f));
     sf::Vector2f pos = this->_playerPos;
     pos.y += this->_player.getGlobalBounds().height - 130.f;
+    pos.x += 20.f;
     this->_playerColision.setPosition(pos);
     this->_playerColision.setFillColor(sf::Color::Transparent);
     this->_playerColision.setOutlineColor(sf::Color::Green);
     this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 130.f;
+    this->_hitboxWidth = 20.f;
     this->_shield = sf::RectangleShape(sf::Vector2f(80, 80));
     this->_shield.setTexture(&this->_shieldTexture);
 }
