@@ -14,14 +14,16 @@ Map::Map(MapType type)
 
 Map::~Map()
 {
+    this->_sound.stop();
 }
 
 void Map::draw(sf::RenderWindow &window)
 {
     window.draw(this->_mapSprite);
-    // for (size_t i = 0; i < this->_colision.size(); i++) {
-    //     window.draw(this->_colision[i]);
-    // }
+    if (this->_isSoundPlayed == false) {
+        this->_sound.play();
+        this->_isSoundPlayed = true;
+    }
 }
 
 std::vector<sf::RectangleShape> Map::getColision()
@@ -66,6 +68,7 @@ void Map::init(MapType type)
     this->_nbCollisionShape = this->_colision.size();
     this->_indexSpawnPos = 0;
     this->_lastSpawnPos = sf::Vector2f(0, 0);
+    this->_isSoundPlayed = false;
     initPos();
 }
 
@@ -122,6 +125,10 @@ void Map::initMapVolcano()
     initSprite();
     this->_colision = initColisionVolcanoMap();
     this->_spawnPos = initSpawnPosVolcanoMap();
+    this->_soundBuffer.loadFromFile("./assets/sound/volcano.ogg");
+    this->_sound.setBuffer(this->_soundBuffer);
+    this->_sound.setVolume(25);
+    this->_sound.setLoop(true);
 }
 
 /*        INITIALISATION MAP JUNGLE        */
@@ -163,6 +170,10 @@ void Map::initMapJungle()
     initSprite();
     this->_colision = initColisionMapJungle();
     this->_spawnPos = initSpawnPosMapJungle();
+    this->_soundBuffer.loadFromFile("./assets/sound/jungle.ogg");
+    this->_sound.setBuffer(this->_soundBuffer);
+    this->_sound.setVolume(25);
+    this->_sound.setLoop(true);
 }
 
 /*        INITIALISATION MAP SNOW        */
@@ -204,6 +215,10 @@ void Map::initMapSnow()
     initSprite();
     this->_colision = initColisionMapSnow();
     this->_spawnPos = initSpawnPosMapSnow();
+    this->_soundBuffer.loadFromFile("./assets/sound/snow.ogg");
+    this->_sound.setBuffer(this->_soundBuffer);
+    this->_sound.setVolume(25);
+    this->_sound.setLoop(true);
 }
 
 /*        INITIALISATION MAP SKY        */
@@ -245,4 +260,8 @@ void Map::initMapSky()
     initSprite();
     this->_colision = initColisionMapSky();
     this->_spawnPos = initSpawnPosMapSky();
+    this->_soundBuffer.loadFromFile("./assets/sound/sky.ogg");
+    this->_sound.setBuffer(this->_soundBuffer);
+    this->_sound.setVolume(25);
+    this->_sound.setLoop(true);
 }

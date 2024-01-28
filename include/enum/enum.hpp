@@ -52,3 +52,9 @@ typedef enum {
     ATTACKL,
     MAXANIMP,
 } PlayerAnimation;
+
+typedef enum {
+    IDLE,
+    HOVER,
+    CLICK
+} ButtonState;

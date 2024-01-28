@@ -36,5 +36,8 @@ class Map {
         std::vector<sf::Vector2f> _spawnPos;
         size_t _indexSpawnPos;
         sf::Vector2f _lastSpawnPos;
+        sf::SoundBuffer _soundBuffer;
+        sf::Sound _sound;
+        bool _isSoundPlayed;
 
 };

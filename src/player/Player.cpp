@@ -164,6 +164,24 @@ void Player::respawn(sf::Vector2f spawnPos)
     updateColision();
 }
 
+
+int Player::useAttack(Player *player)
+{
+    if (this->_attackClock.getElapsedTime().asSeconds() > ATTACK_DELAY) {
+        this->_soundAttack.play();
+        this->_attackClock.restart();
+        this->isAttacking = true;
+        updateAttackColision();
+        if (this->_playerAttackColision.getGlobalBounds().intersects(player->_playerColision.getGlobalBounds())) {
+            if (player->_damageClock.getElapsedTime().asSeconds() > DAMAGE_DELAY) {
+                player->_damageClock.restart();
+                player->_nbLife--;
+            }
+        }
+    }
+    return player->_nbLife;
+}
+
 sf::Keyboard::Key Player::getAttackKey() const
 {
     return this->_attack;
@@ -189,6 +207,7 @@ bool Player::isColliding(Map *map)
     }
     return false;
 }
+
 
 sf::FloatRect Player::getBound()
 {

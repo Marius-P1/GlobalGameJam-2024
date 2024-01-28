@@ -24,37 +24,90 @@ void App::init()
     this->_window.create(sf::VideoMode(1920, 1080), "Sucker Fighter");
     this->_window.setFramerateLimit(60);
     this->_game = new Game();
+    this->_menu = new Menu();
+    this->_sceneType = MENU;
     std::srand(time(NULL));
 }
 
 void App::run()
 {
     while (this->_isRunning) {
-        handleEvent();
-        update();
-        draw();
+        switch (this->_sceneType) {
+            case MENU:
+                runMenu();
+                break;
+            case GAME:
+                runGame();
+                break;
+            default:
+                break;
+        }
     }
 }
 
-void App::handleEvent()
+void App::runMenu()
+{
+    handleEventMenu();
+    updateMenu();
+    drawMenu();
+}
+
+void App::handleEventMenu()
 {
     while (this->_window.pollEvent(this->_event)) {
         if (this->_event.type == sf::Event::Closed)
             this->_isRunning = false;
     }
-    this->_game->handleEvent(this->_event);
+    this->_sceneType = this->_menu->handleEvent(this->_event);
 }
 
-void App::update()
+void App::updateMenu()
+{
+    this->_menu->update();
+}
+
+void App::drawMenu()
+{
+    this->_window.clear(sf::Color::Black);
+    this->_menu->draw(this->_window);
+    this->_window.display();
+}
+
+void App::runGame()
+{
+    handleEventGame();
+    updateGame();
+    drawGame();
+    if (this->_sceneType == MENU) {
+        resetGame();
+    }
+}
+
+void App::handleEventGame()
+{
+    while (this->_window.pollEvent(this->_event)) {
+        if (this->_event.type == sf::Event::Closed)
+            this->_isRunning = false;
+    }
+    this->_sceneType = this->_game->handleEvent(this->_event);
+}
+
+void App::updateGame()
 {
     this->_game->update();
 }
 
-void App::draw()
+void App::drawGame()
 {
     this->_window.clear(sf::Color::Black);
     this->_game->draw(this->_window);
     this->_window.display();
+}
+
+void App::resetGame()
+{
+    delete this->_game;
+    this->_game = new Game();
 }
 
 void App::clean()

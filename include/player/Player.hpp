@@ -41,6 +41,7 @@ class Player {
         sf::Keyboard::Key getSpecial() const;
         void respawn(sf::Vector2f spawnPos);
         sf::Vector2f getPos() const;
+        std::string getPathWinTexture() const;
 
     private:
         //init
@@ -81,6 +82,7 @@ class Player {
         sf::RectangleShape _playerAttackColision;
         sf::Texture _shieldTexture;
         sf::RectangleShape _shield;
+        std::string _pathWinTexture;
         size_t reachSize;
         float _timeAttack;
         float _timeSpecial;
@@ -109,5 +111,16 @@ class Player {
         sf::Keyboard::Key _special;
         sf::Keyboard::Key _jump;
         sf::Keyboard::Key _displayColision;
+        sf::SoundBuffer _soundBufferAttack;
+        sf::Sound _soundAttack;
+        sf::SoundBuffer _soundBufferSpecial;
+        sf::Sound _soundSpecial;
+        sf::SoundBuffer _soundBufferDamage;
+        sf::Sound _soundDamage;
+        sf::SoundBuffer _soundBufferJump;
+        sf::Sound _soundJump;
+        sf::SoundBuffer _soundBufferWin;
+        sf::Sound _soundWin;
+
 
 };
