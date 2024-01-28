@@ -7,9 +7,10 @@
 
 #pragma once
 
-#include "../include.hpp"
-#include "../player/Player.hpp"
-#include "../map/Map.hpp"
+#include "./include.hpp"
+#include "./player/Player.hpp"
+#include "./map/Map.hpp"
+#include "./player/Life.hpp"
 
 class Game {
     public:
@@ -28,12 +29,14 @@ class Game {
 
         Player *_player1;
         PigeonType _player1PigeonType;
+        Life *_player1Life;
         Player *_player2;
         PigeonType _player2PigeonType;
+        Life *_player2Life;
         Map *_map;
         MapType _mapType;
         int _nbPlayerAlive;
-        int _player1Life;
-        int _player2Life;
+        int _nbPlayer1Life;
+        int _nbPlayer2Life;
 
 };
