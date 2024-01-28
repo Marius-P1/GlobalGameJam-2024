@@ -21,7 +21,7 @@ App::~App()
 void App::init()
 {
     this->_isRunning = true;
-    this->_window.create(sf::VideoMode(1920, 1080), "Sucker Fighter");
+    this->_window.create(sf::VideoMode(1920, 1080), "Sucker Fighter", sf::Style::Fullscreen);
     this->_window.setFramerateLimit(60);
     this->_game = new Game();
     this->_menu = new Menu();

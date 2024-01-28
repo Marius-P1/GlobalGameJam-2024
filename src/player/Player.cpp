@@ -164,24 +164,6 @@ void Player::respawn(sf::Vector2f spawnPos)
     updateColision();
 }
 
-
-int Player::useAttack(Player *player)
-{
-    if (this->_attackClock.getElapsedTime().asSeconds() > ATTACK_DELAY) {
-        this->_soundAttack.play();
-        this->_attackClock.restart();
-        this->isAttacking = true;
-        updateAttackColision();
-        if (this->_playerAttackColision.getGlobalBounds().intersects(player->_playerColision.getGlobalBounds())) {
-            if (player->_damageClock.getElapsedTime().asSeconds() > DAMAGE_DELAY) {
-                player->_damageClock.restart();
-                player->_nbLife--;
-            }
-        }
-    }
-    return player->_nbLife;
-}
-
 sf::Keyboard::Key Player::getAttackKey() const
 {
     return this->_attack;
@@ -190,6 +172,11 @@ sf::Keyboard::Key Player::getAttackKey() const
 sf::Keyboard::Key Player::getSpecial() const
 {
     return this->_special;
+}
+
+std::string Player::getPathWinTexture() const
+{
+    return this->_pathWinTexture;
 }
 
 sf::Vector2f Player::getPos() const

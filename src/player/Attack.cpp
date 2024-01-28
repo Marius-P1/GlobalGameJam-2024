@@ -85,9 +85,11 @@ int Player::useSpecial(Player *player)
 void Player::updateAttackColision()
 {
     if (this->lookingRight) {
-        this->_playerAttackColision.setPosition(this->_playerPos.x + this->_playerColision.getGlobalBounds().width, this->_playerPos.y);
+        this->_playerAttackColision.setPosition(this->_playerPos.x + this->_playerColision.getGlobalBounds().width + this->_hitboxWidth,
+        this->_playerPos.y + this->_player.getGlobalBounds().height - this->_hitboxHeight);
     } else {
-        this->_playerAttackColision.setPosition(this->_playerPos.x - this->reachSize, this->_playerPos.y);
+        this->_playerAttackColision.setPosition(this->_playerPos.x + this->_hitboxWidth - this->reachSize,
+        this->_playerPos.y + this->_player.getGlobalBounds().height - this->_hitboxHeight);
     }
 }
 

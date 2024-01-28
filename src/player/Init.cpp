@@ -106,7 +106,8 @@ void Player::initAttackColision(size_t reachSize)
 void Player::updateColision()
 {
     sf::Vector2f pos = this->_playerPos;
-    pos.y += this->_player.getGlobalBounds().height - 173.f;
+    pos.y += this->_player.getGlobalBounds().height - this->_hitboxHeight;
+    pos.x += this->_hitboxWidth;
     this->_playerColision.setPosition(pos);
     updateAttackColision();
 }
@@ -122,6 +123,7 @@ void Player::initFatPigeon()
     sf::Vector2f pos = this->_playerPos;
     pos.y += this->_player.getGlobalBounds().height - 144.f;
     this->_playerColision.setPosition(pos);
+    this->_playerColision.setFillColor(sf::Color::Transparent);
     this->_playerColision.setOutlineColor(sf::Color::Green);
     this->_playerColision.setOutlineThickness(2);
     this->_hitboxHeight = 144.f;
