@@ -33,7 +33,7 @@ class Player {
 
     private:
         void init(PlayerType type, PigeonType pigeonType, sf::Vector2f spawnPos);
-        void initSprite();
+        void initSprite(std::vector<int> array);
         void initTexture(std::string path);
         void initVariables();
         void initPos(sf::Vector2f spawnPos);
@@ -41,6 +41,7 @@ class Player {
         void updateColision();
         void updateAttackColision();
         void updateTextureRect();
+        void updateAttackAnimation();
         bool isColliding(Map *map);
         void initFatPigeon();
         void initSmallPigeon();
@@ -61,9 +62,11 @@ class Player {
         sf::RectangleShape _playerColision;
         sf::RectangleShape _playerAttackColision;
         size_t reachSize;
+        float _timeAttack;
         bool lookingRight;
         bool isAttacking;
         bool displayColision;
+        bool _canDoDJump;
         float _gravity;
         bool _isFly;
         float _jumpForce;
