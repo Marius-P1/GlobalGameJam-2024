@@ -59,6 +59,14 @@ SceneType Game::handleEvent(sf::Event event)
     if (sf::Keyboard::isKeyPressed(this->_player2->getAttackKey())) {
         this->_nbPlayer1Life = this->_player2->useAttack(this->_player1);
     }
+    if (sf::Keyboard::isKeyPressed(this->_player1->getSpecial()) && this->_player1PigeonType != PigeonType::THIN_PIGEON) {
+        this->_nbPlayer2Life = this->_player1->useSpecial(this->_player2);
+    }
+    if (sf::Keyboard::isKeyPressed(this->_player2->getSpecial()) && this->_player2PigeonType != PigeonType::THIN_PIGEON) {
+        this->_nbPlayer1Life = this->_player2->useSpecial(this->_player1);
+    }
+    this->_nbPlayer2Life = this->_player1->makeDamage(this->_player2);
+    this->_nbPlayer1Life = this->_player2->makeDamage(this->_player1);
     return SceneType::GAME;
 }
 

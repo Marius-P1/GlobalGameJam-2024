@@ -10,6 +10,7 @@
 static const float RESPAWN_DELAY = 0.5f;
 static const float DAMAGE_DELAY = 2.f;
 static const float ATTACK_DELAY = 1.f;
+static const float SPECIAL_DELAY = 10.f;
 static const int ATTACK_RANGE = 80;
 
 Player::Player(PlayerType playerType, PigeonType pigeonType, sf::Vector2f pos)
@@ -24,8 +25,19 @@ Player::~Player()
 
 void Player::handleEvent(sf::Event event, Map *map)
 {
-    if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY)
+    this->_map = map;
+    if (this->_type == PigeonType::THIN_PIGEON && (this->_anim == SPECIALR || this->_anim == SPECIALL)){
+        if (sf::Keyboard::isKeyPressed(this->_right))
+            this->move({5.f,0.f}, map);
+        if (sf::Keyboard::isKeyPressed(this->_left))
+            this->move({-5.f,0.f}, map);
         return;
+    }
+    if ((this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY  || this->_attackClock.getElapsedTime().asSeconds() < 0.4f || this->_SpecialClock.getElapsedTime().asSeconds() < 0.4f)){
+        this->_velocity = {0,0};
+        this->_acceleration = {0,0};
+        return;
+    }
     this->_oldPlayerPos = this->_playerPos;
     if (sf::Keyboard::isKeyPressed(this->_right)) {
         this->lookingRight = true;
@@ -59,14 +71,15 @@ void Player::jump()
 {
     if (this->_isJumping == false) {
         this->_acceleration.y = 0;
-        this->_velocity.y = -6.f;
+        this->_velocity.y = this->_jumpForce;
         this->_isFly = true;
         this->_isJumping = FIRSTJUMP;
         return;
-    }
-     else if (this->_isJumping == CANDJUMP){
+    } else if (this->_isJumping == CANDJUMP && this->_canDoDJump == true){
         this->_acceleration.y = 0;
-        this->_velocity.y = -7.f;
+        this->isSpecial = true;
+        this->_attackClock.restart();
+        this->_velocity.y = this->_jumpForce;
         this->_isFly = true;
         this->_isJumping = DOUBLEJUMP;
         return;
@@ -87,6 +100,10 @@ void Player::update(Map *map)
 {
     updateTextureRect();
     updateColision();
+    updateAttackAnimation();
+    updateSpecialAnimation();
+    attackResetAnim();
+    makeDash();
     this->_acceleration.y += this->_gravity;
     this->_velocity.y += this->_acceleration.y;
     if (this->_velocity.y > 15.f)
@@ -110,10 +127,6 @@ void Player::draw(sf::RenderWindow &window)
 {
     updateColision();
     window.draw(this->_player);
-    if (this->isAttacking) {
-        window.draw(this->_playerAttackColision);
-        this->isAttacking = false;
-    }
     if (this->displayColision)
         displayColisionHitBox(window);
     if (this->_respawnClock.getElapsedTime().asSeconds() < RESPAWN_DELAY ||
@@ -176,6 +189,16 @@ int Player::useAttack(Player *player)
     return player->_nbLife;
 }
 
+int Player::useSpecial(Player *player)
+{
+    if (this->_SpecialClock.getElapsedTime().asSeconds() > SPECIAL_DELAY){
+        this->_SpecialClock.restart();
+        this->isSpecial = true;
+        this->_canSpecial = true;
+    }
+    return player->_nbLife;
+}
+
 sf::Keyboard::Key Player::getAttackKey() const
 {
     return this->_attack;
@@ -217,9 +240,72 @@ void Player::updateColision()
     updateAttackColision();
 }
 
+sf::FloatRect Player::getBound()
+{
+    return this->_playerColision.getGlobalBounds();
+}
+
 void Player::updateTextureRect()
 {
     this->_player.setTextureRect(this->_spriteSheet->animate(this->_anim));
+}
+
+int Player::makeDamage(Player *player)
+{
+    if (this->_canSpecial == true && (this->_anim == SPECIALL || this->_anim == SPECIALR) && this->_playerColision.getGlobalBounds().intersects(player->_playerColision.getGlobalBounds()) ) {
+        player->_nbLife -=2;
+        this->_canSpecial = false;
+    }
+    return player->_nbLife;
+}
+
+void Player::makeDash()
+{
+    if (this->_type == PigeonType::FAT_PIGEON || this->_type ==  PigeonType::MUSCULAR_PIGEON || this->_type == PigeonType::SMALL_PIGEON) {
+        if (this->_anim == SPECIALR) {
+            move({7,0}, this->_map);
+        } else if (this->_anim == SPECIALL){
+            move({-7,0}, this->_map);
+        }
+    }
+}
+
+void Player::updateAttackAnimation()
+{
+    if (this->isAttacking) {
+        if (this->lookingRight)
+            this->_anim = ATTACKR;
+        else
+            this->_anim = ATTACKL;
+        this->isAttacking = false;
+    }
+}
+
+void Player::attackResetAnim()
+{
+    if (this->_attackClock.getElapsedTime().asSeconds() > 0.5f &&
+    this->_SpecialClock.getElapsedTime().asSeconds() > 0.5f) {
+        if (this->lookingRight)
+                this->_anim = IDLER;
+            else
+                this->_anim = IDLEL;
+    }
+}
+
+void Player::updateSpecialAnimation()
+{
+    if (this->isSpecial) {
+        if (this->lookingRight)
+            this->_anim = SPECIALR;
+        else
+            this->_anim = SPECIALL;
+        this->isSpecial = false;
+    }
+}
+
+sf::Keyboard::Key Player::getSpecial() const
+{
+    return this->_special;
 }
 
 std::string Player::getPathWinTexture() const
@@ -230,7 +316,7 @@ std::string Player::getPathWinTexture() const
 void Player::init(PlayerType numberOfThePlayer, PigeonType pigeonType, sf::Vector2f spawnPos)
 {
     initPos(spawnPos);
-    initVariables();
+    initVariables(pigeonType);
 
     switch (pigeonType) {
         case PigeonType::FAT_PIGEON :
@@ -263,6 +349,7 @@ void Player::initTouch(PlayerType numberOfThePlayer)
         this->_left = sf::Keyboard::Q;
         this->_up = sf::Keyboard::Z;
         this->_attack = sf::Keyboard::E;
+        this->_special = sf::Keyboard::A;
         this->_jump = sf::Keyboard::Space;
         this->_displayColision = sf::Keyboard::K;
     } else {
@@ -270,15 +357,15 @@ void Player::initTouch(PlayerType numberOfThePlayer)
         this->_left = sf::Keyboard::Left;
         this->_up = sf::Keyboard::Up;
         this->_attack = sf::Keyboard::Numpad0;
+        this->_special = sf::Keyboard::Numpad2;
         this->_jump = sf::Keyboard::Numpad1;
         this->_displayColision = sf::Keyboard::Add;
     }
 }
 
-void Player::initSprite()
+void Player::initSprite(std::vector<int> array)
 {
-    std::vector<int> _array = {1, 1, 7, 7, 5, 5, 5, 5};
-    this->_spriteSheet = new SpriteSheetSimplifier(8, 120, 180, _array);
+    this->_spriteSheet = new SpriteSheetSimplifier(8, 120, 180, array);
     sf::Sprite sprite(_playerTexture, this->_spriteSheet->animate(IDLEL));
     this->_player = sprite;
 }
@@ -289,15 +376,17 @@ void Player::initTexture(std::string path)
     this->_shieldTexture.loadFromFile("assets/player/shield.png");
 }
 
-void Player::initVariables()
+void Player::initVariables(PigeonType pigeonType)
 {
+    this->_type = pigeonType;
     this->_oldPlayerPos = this->_playerPos;
     this->lookingRight = true;
     this->isAttacking = false;
+    this->isSpecial = false;
     this->displayColision = false;
     this->_isJumping = JumpType::NOJUMP;
     this->_gravity = 0.01f;
-    this->_jumpForce = 6.f;
+    this->_jumpForce = -7.f;
     this->_velocity = {0,0};
     this->_acceleration = {0,0};
     this->_nbLife = 3;
@@ -323,7 +412,9 @@ void Player::initAttackColision(size_t reachSize)
 void Player::initFatPigeon()
 {
     initTexture("assets/player/fatPigeon.png");
-    initSprite();
+    std::vector<int> _array = {1, 1, 8, 8, 5, 5, 3, 3};
+    this->_canDoDJump = false;
+    initSprite(_array);
 
     this->_playerColision = sf::RectangleShape(sf::Vector2f(87.f, 144.f));
     sf::Vector2f pos = this->_playerPos;
@@ -348,7 +439,9 @@ void Player::initFatPigeon()
 void Player::initSmallPigeon()
 {
     initTexture("assets/player/smallPigeon.png");
-    initSprite();
+    std::vector<int> _array = {1, 1, 8, 8, 4, 4, 5, 5};
+    this->_canDoDJump = false;
+    initSprite(_array);
 
     this->_playerColision = sf::RectangleShape(sf::Vector2f(75.f, 105.f));
     sf::Vector2f pos = this->_playerPos;
@@ -373,7 +466,9 @@ void Player::initSmallPigeon()
 void Player::initThinPigeon()
 {
     initTexture("assets/player/thinPigeon.png");
-    initSprite();
+    std::vector<int> _array = {1, 1, 8, 8, 3, 3, 4, 4};
+    this->_canDoDJump = true;
+    initSprite(_array);
 
     this->_playerColision = sf::RectangleShape(sf::Vector2f(69.f, 149.f));
     sf::Vector2f pos = this->_playerPos;
@@ -398,7 +493,9 @@ void Player::initThinPigeon()
 void Player::initMuscularPigeon()
 {
     initTexture("assets/player/muscularPigeon.png");
-    initSprite();
+    std::vector<int> _array = {1, 1, 8, 8, 5, 5, 5, 5};
+    this->_canDoDJump = false;
+    initSprite(_array);
 
     this->_playerColision = sf::RectangleShape(sf::Vector2f(80.f, 130.f));
     sf::Vector2f pos = this->_playerPos;
