@@ -40,4 +40,4 @@ CMakeFiles
 CMakeCache.txt
 
 #zip
-.zip
+*.zip
