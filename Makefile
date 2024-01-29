@@ -45,9 +45,10 @@ color_yellow = /bin/echo -e "\x1b[33m $1\x1b[0m"
 
 ### Take Care !!!! static buil require that the lib is corretly linked in the good order if not you got teribly undefined...
 ## good linking = no problem 
-# here we include static lib in the good order so we dont need .dll anymore
+# here we include static lib in the good order so we dont need .dll anymore / first we take the .rc (contain a icon) and we compile it to .res (resource) then we link it to the .exe
+# then compile all source file and link the .exe with the static lib in the good order
 win_build:
-				x86_64-w64-mingw32-windres win-build.rc -O coff -o win-build.res
+				x86_64-w64-mingw32-windres win-build.rc -O coff -o win-build.res 
 				x86_64-w64-mingw32-g++ $(SRC) -o ./build/win32/$(NAME)  win-build.res $(WIN_INCLUDE) $(WIN_LIBS) -lsfml-graphics-s -lsfml-window-s -lsfml-audio-s -lsfml-system-s -lopengl32 -lwinmm -lgdi32 -lsfml-window -lopenal32 -lFLAC -lvorbisenc -lvorbisfile -lvorbis -logg -DSFML_STATIC
 				zip -r ./build/$(NAME).zip ./build/win32/
 				@$(MAKE) clean -s
