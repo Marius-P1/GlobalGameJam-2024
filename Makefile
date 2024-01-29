@@ -6,7 +6,7 @@
 ##
 
 ## config
-NAME = 			GGJ2024
+NAME = 			Sucker_Fight
 
 _SRC =			app/App.cpp \
 				player/Player.cpp \
@@ -42,15 +42,19 @@ color_green = /bin/echo -e "\x1b[32m $1\x1b[0m"
 color_yellow = /bin/echo -e "\x1b[33m $1\x1b[0m"
 
 ##Rules
+
+### Take Care !!!! static buil require that the lib is corretly linked in the good order if not you got teribly undefined...
+## good linking = no problem 
+# here we include static lib in the good order so we dont need .dll anymore
 win_build:
 				x86_64-w64-mingw32-windres win-build.rc -O coff -o win-build.res
-				x86_64-w64-mingw32-g++ -DSFML_STATIC -o ./build/win32/$(NAME) $(SRC) win-build.res $(WIN_INCLUDE) $(WIN_LIBS) $(MODULES)
+				x86_64-w64-mingw32-g++ $(SRC) -o ./build/win32/$(NAME)  win-build.res $(WIN_INCLUDE) $(WIN_LIBS) -static-libgcc -static-libstdc++ -lsfml-graphics-s -lsfml-window-s -lsfml-audio-s -lsfml-system-s -lopengl32 -lwinmm -lgdi32 -lsfml-window -lopenal32 -lFLAC -lvorbisenc -lvorbisfile -lvorbis -logg -DSFML_STATIC 
+				zip -r ./build/$(NAME).zip ./build/win32/
 				@$(MAKE) clean -s
 $(NAME):
-				@g++ -o ./build/linux/$(NAME) $(SRC) $(INC) $(LIBS) $(MODULES) $(FLAGS)
+				@g++ -o ./build/linux/$(NAME) $(SRC) $(INC) $(LIBS) $(MODULES) $(FLAGS) 
 				@$(call color_green,"Compilation Done ✅ !")
 				@$(MAKE) clean -s
-
 clean:
 				@rm -f $(OBJ)
 fclean: 		clean
@@ -58,8 +62,7 @@ fclean: 		clean
 
 re: 			fclean all
 
-
 run: re
 	clear
 	@$(call color_yellow,"🚀:")
-	@./$(NAME) $(ARGS)
+	@cd ./build/linux && ./$(NAME) $(ARGS)
