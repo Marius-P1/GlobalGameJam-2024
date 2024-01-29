@@ -31,9 +31,9 @@ FLAGS 	=		-W -Wall -Wextra -Werror -g
 
 MODULES = -l sfml-graphics -l sfml-window -l sfml-system -l sfml-audio
 
-WIN_INCLUDE = -I./WIN_NEED/include -I./include
+WIN_INCLUDE = 	-I./SFML-2.6.1/include -I./include
 
-WIN_LIBS =		-L./WIN_NEED/lib
+WIN_LIBS =		-L./SFML-2.6.1/lib
 
 all: 			$(NAME) clean
 
@@ -43,10 +43,11 @@ color_yellow = /bin/echo -e "\x1b[33m $1\x1b[0m"
 
 ##Rules
 win_build:
-				x86_64-w64-mingw32-g++ -DSFML_STATIC -static -mwindows -std=c++17 $(WIN_INCLUDE) $(WIN_LIBS) $(SRC) -lsfml-graphics -lsfml-window -lsfml-system -o GGJ2024.exe
+				x86_64-w64-mingw32-windres win-build.rc -O coff -o win-build.res
+				x86_64-w64-mingw32-g++ -DSFML_STATIC -o ./build/win32/$(NAME) $(SRC) win-build.res $(WIN_INCLUDE) $(WIN_LIBS) $(MODULES)
 				@$(MAKE) clean -s
 $(NAME):
-				@g++ -o $(NAME) $(SRC) $(INC) $(LIBS) $(MODULES) $(FLAGS)
+				@g++ -o ./build/linux/$(NAME) $(SRC) $(INC) $(LIBS) $(MODULES) $(FLAGS)
 				@$(call color_green,"Compilation Done ✅ !")
 				@$(MAKE) clean -s
 
