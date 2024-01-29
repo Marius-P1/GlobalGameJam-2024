@@ -29,7 +29,11 @@ INC = 			-I./include
 
 FLAGS 	=		-W -Wall -Wextra -Werror -g
 
-MODULES = -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+MODULES = -l sfml-graphics -l sfml-window -l sfml-system -l sfml-audio
+
+WIN_INCLUDE = -I./WIN_NEED/include -I./include
+
+WIN_LIBS =		-L./WIN_NEED/lib
 
 all: 			$(NAME) clean
 
@@ -38,6 +42,9 @@ color_green = /bin/echo -e "\x1b[32m $1\x1b[0m"
 color_yellow = /bin/echo -e "\x1b[33m $1\x1b[0m"
 
 ##Rules
+win_build:
+				x86_64-w64-mingw32-g++ -DSFML_STATIC -static -mwindows -std=c++17 $(WIN_INCLUDE) $(WIN_LIBS) $(SRC) -lsfml-graphics -lsfml-window -lsfml-system -o GGJ2024.exe
+				@$(MAKE) clean -s
 $(NAME):
 				@g++ -o $(NAME) $(SRC) $(INC) $(LIBS) $(MODULES) $(FLAGS)
 				@$(call color_green,"Compilation Done ✅ !")
@@ -49,6 +56,7 @@ fclean: 		clean
 				@rm -f $(NAME)
 
 re: 			fclean all
+
 
 run: re
 	clear

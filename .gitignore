@@ -34,3 +34,8 @@ GGJ2024
 
 # IDE
 .vscode
+
+# CMake
+CMakeFiles
+CMakeCache.txt
+build
