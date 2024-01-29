@@ -20,7 +20,10 @@ App::~App()
 
 void App::init()
 {
+    auto image = sf::Image{};
+    image.loadFromFile("./assets/icon.png");
     this->_isRunning = true;
+    this->_window.setIcon(image.getSize().x, image.getSize().y, image.getPixelsPtr());
     this->_window.create(sf::VideoMode(1920, 1080), "Sucker Fighter", sf::Style::Fullscreen);
     this->_window.setFramerateLimit(60);
     this->_game = new Game();

@@ -60,6 +60,7 @@ int Player::useAttack(Player *player)
 {
     if (this->_attackClock.getElapsedTime().asSeconds() > ATTACK_DELAY) {
         this->_attackClock.restart();
+        this->_soundAttack.play();
         this->isAttacking = true;
         updateAttackColision();
         if (this->_playerAttackColision.getGlobalBounds().intersects(player->_playerColision.getGlobalBounds())) {
@@ -76,6 +77,7 @@ int Player::useSpecial(Player *player)
 {
     if (this->_SpecialClock.getElapsedTime().asSeconds() > SPECIAL_DELAY){
         this->_SpecialClock.restart();
+        this->_soundSpecial.play();
         this->isSpecial = true;
         this->_canSpecial = true;
     }
