@@ -43,17 +43,17 @@ The game was developed using the following technologies:
   - Arthur    - [Portfolio](https://www.behance.net/arthurlecomte)
   - Celestine - [Portfolio](https://www.instagram.com/celestxne_dessine/)
 
+**How to Play:**
+
+For the latest stable release, visit the [Release Page](https://github.com/Marius-P1/GlobalGameJam-2024/releases/tag/Release) and download the executable for your platform.
+
+
 **Screenshots:**
 
 <img src="/doc/Screenshot1.png" alt="Game Screenshot"/>
 <img src="/doc/Screenshot.png" alt="Game Screenshot"/>
 
-
-**How to Play:**
-
-1. Download or clone the repository.
-2. Compile and run the game using SFML.
-3. Grab a friend and enjoy a fast-paced, local multiplayer gaming experience!
+**Contribute:**
 
 Feel free to explore the code, contribute, or provide feedback. We hope you have fun playing Sucker Fight! 🎮
 
