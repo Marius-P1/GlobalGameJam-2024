@@ -50,7 +50,7 @@ color_yellow = @/bin/echo -e "\x1b[33m $1\x1b[0m"
 win_build:
 				$(call color_green,"Compiling Windows files...")
 				@x86_64-w64-mingw32-windres win-build.rc -O coff -o win-build.res
-				@x86_64-w64-mingw32-g++ $(SRC) -o ./build/win32/$(NAME) -static-libstdc++ win-build.res $(WIN_INCLUDE) $(WIN_LIBS) -lsfml-graphics-s -lsfml-window-s -lsfml-audio-s -lsfml-system-s -lopengl32 -lwinmm -lgdi32 -lsfml-window -lopenal32 -lFLAC -lvorbisenc -lvorbisfile -lvorbis -logg -DSFML_STATIC
+				@x86_64-w64-mingw32-g++ $(SRC) -o ./build/win32/$(NAME) -static-libgcc -static-libstdc++ win-build.res $(WIN_INCLUDE) $(WIN_LIBS) -lsfml-graphics-s -lsfml-window-s -lsfml-audio-s -lsfml-system-s -lopengl32 -lwinmm -lgdi32 -lsfml-window -lopenal32 -lFLAC -lvorbisenc -lvorbisfile -lvorbis -logg -DSFML_STATIC
 				@cd ./build/win32 && zip -r $(NAME)Win.zip . && mv $(NAME)Win.zip ../
 				@$(call color_green,"Windows build Done ✅ !  folder: ./build/$(NAME)Win.zip")
 				@$(MAKE) clean -s
