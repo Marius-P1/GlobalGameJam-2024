@@ -41,7 +41,7 @@ The game was developed using the following technologies:
   - Elias     - [Portfolio](https://www.instagram.com/jyrul.creation/)
   - Ines      - [Portfolio](https://www.instagram.com/just_a_lys/)
   - Arthur    - [Portfolio](https://www.behance.net/arthurlecomte)
-  - Celestine - [Portfolio](https://www.instagram.com/celestxne_dessine/)
+  - Celestine - [Portfolio](https://www.behance.net/clestinedagnaud)
 
 **How to Play:**
 
